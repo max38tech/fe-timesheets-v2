@@ -651,3 +651,4 @@ E0611 14:12:36.202233   36564 watch.go:76] watchAllDir unable to walk dir `c:\CO
  {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0611 14:13:26.202540   36564 load.go:23] Could not load config from \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\": could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\n"}}
 [info] [Firebase Plugin] Stopping Data Connect toolkit
 [warn] !  Data Connect Emulator has exited upon receiving signal: SIGKILL 
+[debug] [2025-06-12T01:17:30.591Z] [Firebase Plugin] Activating Firebase extension.
