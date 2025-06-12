@@ -21,3 +21,9 @@ runConfig:
   # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
   # - variable: MY_SECRET
   #   secret: mySecretRef
+
+# Settings for Web (on Firebase Hosting).
+# See https://firebase.google.com/docs/app-hosting/configure#firebase-hosting
+webConfig:
+  outputDirectory: ".next"
+  type: "Web"
