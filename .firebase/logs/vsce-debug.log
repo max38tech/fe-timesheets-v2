@@ -2630,3 +2630,119 @@ E0612 14:50:58.953534   15980 watch.go:76] watchAllDir unable to walk dir `c:\CO
  {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0612 14:51:48.947888   15980 load.go:23] Could not load config from \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\": could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\n"}}
 [info] [Firebase Plugin] Stopping Data Connect toolkit
 [warn] !  Data Connect Emulator has exited upon receiving signal: SIGKILL 
+[debug] [2025-06-12T05:52:14.677Z] [Firebase Plugin] Activating Firebase extension.
+[debug] [2025-06-12T05:52:14.973Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2025-06-12T05:52:14.975Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-06-12T05:52:14.976Z] > authorizing via signed-in user (shawn.shiobara@gmail.com)
+[debug] [2025-06-12T05:52:14.984Z] Checked if tokens are valid: true, expires at: 1749709978301
+[debug] [2025-06-12T05:52:14.984Z] Checked if tokens are valid: true, expires at: 1749709978301
+[debug] [2025-06-12T05:52:14.985Z] [Firebase Plugin] User found:  shawn.shiobara@gmail.com
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2025-06-12T05:52:14.993Z] Checked if tokens are valid: true, expires at: 1749709978301
+[debug] [2025-06-12T05:52:14.996Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-06-12T05:52:15.023Z] [Firebase Plugin] VSCode notification server listening on port 40001
+[info] [Firebase Plugin] Starting Data Connect toolkit (version 2.6.3) on port 50001
+[debug] [2025-06-12T05:52:15.637Z] 'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E0612 14:52:15.623716   19552 cmd.go:43] Error loading data connect config: could not find dataconnect.yaml in `c:\CODE\fe-timesheets\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"'fdc build' failed with error: Unable to build your Data Connect schema and connectors (exit code 1): E0612 14:52:15.623716   19552 cmd.go:43] Error loading data connect config: could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\n"}}
+[debug] [2025-06-12T05:52:15.639Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2025-06-12T05:52:15.640Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2025-06-12T05:52:15.640Z] Starting Data Connect Emulator with command {"binary":"C:\\Users\\shawn\\.cache\\firebase\\emulators\\dataconnect-emulator-2.6.3.exe","args":["--logtostderr","-v=2","dev","--listen=localhost:50001","--config_dir=c:\\CODE\\fe-timesheets\\dataconnect","--enable_output_schema_extensions=true","--enable_output_generated_sdk=true"],"optionalArgs":["listen","config_dir","enable_output_schema_extensions","enable_output_generated_sdk"],"joinArgs":true,"shell":false,"port":9399} {"metadata":{"emulator":{"name":"dataconnect"},"message":"Starting Data Connect Emulator with command {\"binary\":\"C:\\\\Users\\\\shawn\\\\.cache\\\\firebase\\\\emulators\\\\dataconnect-emulator-2.6.3.exe\",\"args\":[\"--logtostderr\",\"-v=2\",\"dev\",\"--listen=localhost:50001\",\"--config_dir=c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\",\"--enable_output_schema_extensions=true\",\"--enable_output_generated_sdk=true\"],\"optionalArgs\":[\"listen\",\"config_dir\",\"enable_output_schema_extensions\",\"enable_output_generated_sdk\"],\"joinArgs\":true,\"shell\":false,\"port\":9399}"}}
+[info] i  dataconnect: Data Connect Emulator logging to dataconnect-debug.log {"metadata":{"emulator":{"name":"dataconnect"},"message":"Data Connect Emulator logging to \u001b[1mdataconnect-debug.log\u001b[22m"}}
+[debug] [2025-06-12T05:52:15.735Z] E0612 14:52:15.713894   21188 load.go:23] Could not load config from "c:\\CODE\\fe-timesheets\\dataconnect": could not find dataconnect.yaml in `c:\CODE\fe-timesheets\dataconnect`
+E0612 14:52:15.716110   21188 watch.go:76] watchAllDir unable to walk dir `c:\CODE\fe-timesheets\dataconnect`: on path "c:\\CODE\\fe-timesheets\\dataconnect" (DirEntry: <nil>): CreateFile c:\CODE\fe-timesheets\dataconnect: The system cannot find the file specified.
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0612 14:52:15.713894   21188 load.go:23] Could not load config from \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\": could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\nE0612 14:52:15.716110   21188 watch.go:76] watchAllDir unable to walk dir `c:\\CODE\\fe-timesheets\\dataconnect`: on path \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\" (DirEntry: <nil>): CreateFile c:\\CODE\\fe-timesheets\\dataconnect: The system cannot find the file specified.\n"}}
+[debug] [2025-06-12T05:52:15.743Z] I0612 14:52:15.739226   21188 dev.go:95] Listening on address (HTTP + gRPC): 127.0.0.1:50001
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 14:52:15.739226   21188 dev.go:95] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
+[error] [Firebase Plugin] error:  {}
+[debug] [2025-06-12T05:52:16.428Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-06-12T05:52:16.428Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-06-12T05:52:25.733Z] E0612 14:52:25.733140   21188 load.go:23] Could not load config from "c:\\CODE\\fe-timesheets\\dataconnect": could not find dataconnect.yaml in `c:\CODE\fe-timesheets\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0612 14:52:25.733140   21188 load.go:23] Could not load config from \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\": could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\n"}}
+[debug] [2025-06-12T05:52:35.725Z] E0612 14:52:35.724738   21188 load.go:23] Could not load config from "c:\\CODE\\fe-timesheets\\dataconnect": could not find dataconnect.yaml in `c:\CODE\fe-timesheets\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0612 14:52:35.724738   21188 load.go:23] Could not load config from \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\": could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\n"}}
+[debug] [2025-06-12T05:52:45.732Z] E0612 14:52:45.731945   21188 load.go:23] Could not load config from "c:\\CODE\\fe-timesheets\\dataconnect": could not find dataconnect.yaml in `c:\CODE\fe-timesheets\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0612 14:52:45.731945   21188 load.go:23] Could not load config from \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\": could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\n"}}
+[debug] [2025-06-12T05:52:56.367Z] E0612 14:52:55.729864   21188 load.go:23] Could not load config from "c:\\CODE\\fe-timesheets\\dataconnect": could not find dataconnect.yaml in `c:\CODE\fe-timesheets\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0612 14:52:55.729864   21188 load.go:23] Could not load config from \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\": could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\n"}}
+[debug] [2025-06-12T05:53:05.724Z] E0612 14:53:05.727134   21188 load.go:23] Could not load config from "c:\\CODE\\fe-timesheets\\dataconnect": could not find dataconnect.yaml in `c:\CODE\fe-timesheets\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0612 14:53:05.727134   21188 load.go:23] Could not load config from \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\": could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\n"}}
+[debug] [2025-06-12T05:53:15.721Z] E0612 14:53:15.724403   21188 load.go:23] Could not load config from "c:\\CODE\\fe-timesheets\\dataconnect": could not find dataconnect.yaml in `c:\CODE\fe-timesheets\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0612 14:53:15.724403   21188 load.go:23] Could not load config from \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\": could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\n"}}
+[debug] [2025-06-12T05:53:25.715Z] E0612 14:53:25.719232   21188 load.go:23] Could not load config from "c:\\CODE\\fe-timesheets\\dataconnect": could not find dataconnect.yaml in `c:\CODE\fe-timesheets\dataconnect`
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"E0612 14:53:25.719232   21188 load.go:23] Could not load config from \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\": could not find dataconnect.yaml in `c:\\CODE\\fe-timesheets\\dataconnect`\n"}}
+[debug] [2025-06-12T05:53:35.721Z] I0612 14:53:35.725424   21188 load.go:37] Reloading schema and connectors...
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 14:53:35.725424   21188 load.go:37] Reloading schema and connectors...\n"}}
+[debug] [2025-06-12T05:53:35.766Z] I0612 14:53:35.768997   21188 control.go:73] [/emulator/fe-timesheets f91e] UpdateResources(): done
+Schema: sources: schema\schema.gql [2088B] 
+Connector "default": sources: connector\queries.gql [1802B] connector\mutations.gql [1233B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 14:53:35.768997   21188 control.go:73] [/emulator/fe-timesheets f91e] UpdateResources(): done\nSchema: sources: schema\\schema.gql [2088B] \nConnector \"default\": sources: connector\\queries.gql [1802B] connector\\mutations.gql [1233B] \n"}}
+[debug] [2025-06-12T05:53:35.798Z] I0612 14:53:35.789936   21188 collector.go:107] schema extensions wrote into "c:\\CODE\\fe-timesheets\\dataconnect\\.dataconnect\\schema"
+Generated sources: prelude.gql [71531B] 
+I0612 14:53:35.789936   21188 load.go:115] Finished reloading
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 14:53:35.789936   21188 collector.go:107] schema extensions wrote into \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\\\\.dataconnect\\\\schema\"\nGenerated sources: prelude.gql [71531B] \nI0612 14:53:35.789936   21188 load.go:115] Finished reloading\n"}}
+[debug] [2025-06-12T05:54:05.724Z] I0612 14:54:05.723683   21188 load.go:37] Reloading schema and connectors...
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 14:54:05.723683   21188 load.go:37] Reloading schema and connectors...\n"}}
+[debug] [2025-06-12T05:54:05.751Z] I0612 14:54:05.750664   21188 codegen.go:82] [connector "default" javascriptSdk] Generating sources into "c:\\CODE\\fe-timesheets\\dataconnect-generated\\js\\default-connector"
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 14:54:05.750664   21188 codegen.go:82] [connector \"default\" javascriptSdk] Generating sources into \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect-generated\\\\js\\\\default-connector\"\n"}}
+[debug] [2025-06-12T05:54:05.765Z] I0612 14:54:05.762673   21188 collector.go:107] schema extensions wrote into "c:\\CODE\\fe-timesheets\\dataconnect\\.dataconnect\\schema"
+Generated sources: prelude.gql [71531B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 14:54:05.762673   21188 collector.go:107] schema extensions wrote into \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\\\\.dataconnect\\\\schema\"\nGenerated sources: prelude.gql [71531B] \n"}}
+[debug] [2025-06-12T05:54:05.787Z] I0612 14:54:05.781895   21188 collector.go:107] connector "default" javascriptSdk wrote into "c:\\CODE\\fe-timesheets\\dataconnect-generated\\js\\default-connector"
+Generated sources: react\esm\package.json [17B] react\index.cjs.js [0B] react\esm\index.esm.js [0B] index.cjs.js [151B] package.json [860B] react\index.d.ts [228B] README.md [2774B] react\package.json [468B] react\README.md [5357B] index.d.ts [246B] esm\index.esm.js [116B] esm\package.json [17B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 14:54:05.781895   21188 collector.go:107] connector \"default\" javascriptSdk wrote into \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect-generated\\\\js\\\\default-connector\"\nGenerated sources: react\\esm\\package.json [17B] react\\index.cjs.js [0B] react\\esm\\index.esm.js [0B] index.cjs.js [151B] package.json [860B] react\\index.d.ts [228B] README.md [2774B] react\\package.json [468B] react\\README.md [5357B] index.d.ts [246B] esm\\index.esm.js [116B] esm\\package.json [17B] \n"}}
+[debug] [2025-06-12T05:54:05.790Z] I0612 14:54:05.789246   21188 installsdk.go:80] Running command: npm install file:dataconnect-generated\js\default-connector
+E0612 14:54:05.789246   21188 installsdk.go:82] Failed to install package: exec: "npm": executable file not found in %PATH%
+I0612 14:54:05.789246   21188 load.go:115] Finished reloading
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 14:54:05.789246   21188 installsdk.go:80] Running command: npm install file:dataconnect-generated\\js\\default-connector\nE0612 14:54:05.789246   21188 installsdk.go:82] Failed to install package: exec: \"npm\": executable file not found in %PATH%\nI0612 14:54:05.789246   21188 load.go:115] Finished reloading\n"}}
+[info] [Firebase Plugin] Stopping Data Connect toolkit
+[warn] !  Data Connect Emulator has exited upon receiving signal: SIGKILL 
+[debug] [2025-06-12T07:46:11.730Z] [Firebase Plugin] Activating Firebase extension.
+[debug] [2025-06-12T07:46:12.018Z] [Firebase Plugin] requireAuthWrapper
+[debug] [2025-06-12T07:46:12.020Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-06-12T07:46:12.020Z] > authorizing via signed-in user (shawn.shiobara@gmail.com)
+[debug] [2025-06-12T07:46:12.023Z] Checked if tokens are valid: false, expires at: 1749709978301
+[debug] [2025-06-12T07:46:12.023Z] Checked if tokens are valid: false, expires at: 1749709978301
+[debug] [2025-06-12T07:46:12.023Z] > refreshing access token with scopes: []
+[debug] [2025-06-12T07:46:12.024Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-06-12T07:46:12.024Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-06-12T07:46:12.034Z] [Firebase Plugin] VSCode notification server listening on port 40001
+[info] [Firebase Plugin] Starting Data Connect toolkit (version 2.6.3) on port 50001
+[debug] [2025-06-12T07:46:12.675Z] I0612 16:46:12.643886   19852 control.go:73] [/emulator/fe-timesheets c1df] UpdateResources(): done
+Schema: sources: schema\schema.gql [2088B] 
+Connector "default": sources: connector\mutations.gql [1233B] connector\queries.gql [1802B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 16:46:12.643886   19852 control.go:73] [/emulator/fe-timesheets c1df] UpdateResources(): done\nSchema: sources: schema\\schema.gql [2088B] \nConnector \"default\": sources: connector\\mutations.gql [1233B] connector\\queries.gql [1802B] \n"}}
+[debug] [2025-06-12T07:46:12.676Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2025-06-12T07:46:12.676Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"dataconnect"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2025-06-12T07:46:12.676Z] Starting Data Connect Emulator with command {"binary":"C:\\Users\\shawn\\.cache\\firebase\\emulators\\dataconnect-emulator-2.6.3.exe","args":["--logtostderr","-v=2","dev","--listen=localhost:50001","--config_dir=c:\\CODE\\fe-timesheets\\dataconnect","--enable_output_schema_extensions=true","--enable_output_generated_sdk=true"],"optionalArgs":["listen","config_dir","enable_output_schema_extensions","enable_output_generated_sdk"],"joinArgs":true,"shell":false,"port":9399} {"metadata":{"emulator":{"name":"dataconnect"},"message":"Starting Data Connect Emulator with command {\"binary\":\"C:\\\\Users\\\\shawn\\\\.cache\\\\firebase\\\\emulators\\\\dataconnect-emulator-2.6.3.exe\",\"args\":[\"--logtostderr\",\"-v=2\",\"dev\",\"--listen=localhost:50001\",\"--config_dir=c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\",\"--enable_output_schema_extensions=true\",\"--enable_output_generated_sdk=true\"],\"optionalArgs\":[\"listen\",\"config_dir\",\"enable_output_schema_extensions\",\"enable_output_generated_sdk\"],\"joinArgs\":true,\"shell\":false,\"port\":9399}"}}
+[info] i  dataconnect: Data Connect Emulator logging to dataconnect-debug.log {"metadata":{"emulator":{"name":"dataconnect"},"message":"Data Connect Emulator logging to \u001b[1mdataconnect-debug.log\u001b[22m"}}
+[debug] [2025-06-12T07:46:12.710Z] I0612 16:46:12.710140    8448 load.go:37] Reloading schema and connectors...
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 16:46:12.710140    8448 load.go:37] Reloading schema and connectors...\n"}}
+[debug] [2025-06-12T07:46:12.731Z] I0612 16:46:12.730764    8448 control.go:73] [/emulator/fe-timesheets f5d1] UpdateResources(): done
+Schema: sources: schema\schema.gql [2088B] 
+Connector "default": sources: connector\mutations.gql [1233B] connector\queries.gql [1802B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 16:46:12.730764    8448 control.go:73] [/emulator/fe-timesheets f5d1] UpdateResources(): done\nSchema: sources: schema\\schema.gql [2088B] \nConnector \"default\": sources: connector\\mutations.gql [1233B] connector\\queries.gql [1802B] \n"}}
+[debug] [2025-06-12T07:46:12.780Z] I0612 16:46:12.771471    8448 codegen.go:82] [connector "default" javascriptSdk] Generating sources into "c:\\CODE\\fe-timesheets\\dataconnect-generated\\js\\default-connector"
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 16:46:12.771471    8448 codegen.go:82] [connector \"default\" javascriptSdk] Generating sources into \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect-generated\\\\js\\\\default-connector\"\n"}}
+[debug] [2025-06-12T07:46:12.798Z] I0612 16:46:12.798259    8448 collector.go:107] schema extensions wrote into "c:\\CODE\\fe-timesheets\\dataconnect\\.dataconnect\\schema"
+Generated sources: prelude.gql [71531B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 16:46:12.798259    8448 collector.go:107] schema extensions wrote into \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect\\\\.dataconnect\\\\schema\"\nGenerated sources: prelude.gql [71531B] \n"}}
+[debug] [2025-06-12T07:46:12.807Z] I0612 16:46:12.807652    8448 collector.go:107] connector "default" javascriptSdk wrote into "c:\\CODE\\fe-timesheets\\dataconnect-generated\\js\\default-connector"
+Generated sources: README.md [2774B] react\package.json [468B] react\README.md [5357B] index.d.ts [246B] esm\index.esm.js [116B] esm\package.json [17B] index.cjs.js [151B] react\esm\index.esm.js [0B] package.json [860B] react\index.d.ts [228B] react\esm\package.json [17B] react\index.cjs.js [0B] 
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 16:46:12.807652    8448 collector.go:107] connector \"default\" javascriptSdk wrote into \"c:\\\\CODE\\\\fe-timesheets\\\\dataconnect-generated\\\\js\\\\default-connector\"\nGenerated sources: README.md [2774B] react\\package.json [468B] react\\README.md [5357B] index.d.ts [246B] esm\\index.esm.js [116B] esm\\package.json [17B] index.cjs.js [151B] react\\esm\\index.esm.js [0B] package.json [860B] react\\index.d.ts [228B] react\\esm\\package.json [17B] react\\index.cjs.js [0B] \n"}}
+[debug] [2025-06-12T07:46:12.817Z] I0612 16:46:12.816785    8448 installsdk.go:80] Running command: npm install file:dataconnect-generated\js\default-connector
+E0612 16:46:12.816785    8448 installsdk.go:82] Failed to install package: exec: "npm": executable file not found in %PATH%
+I0612 16:46:12.817785    8448 load.go:115] Finished reloading
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 16:46:12.816785    8448 installsdk.go:80] Running command: npm install file:dataconnect-generated\\js\\default-connector\nE0612 16:46:12.816785    8448 installsdk.go:82] Failed to install package: exec: \"npm\": executable file not found in %PATH%\nI0612 16:46:12.817785    8448 load.go:115] Finished reloading\n"}}
+[debug] [2025-06-12T07:46:12.827Z] I0612 16:46:12.827188    8448 dev.go:95] Listening on address (HTTP + gRPC): 127.0.0.1:50001
+ {"metadata":{"emulator":{"name":"dataconnect"},"message":"I0612 16:46:12.827188    8448 dev.go:95] Listening on address (HTTP + gRPC): 127.0.0.1:50001\n"}}
+[error] [Firebase Plugin] error:  {}
+[debug] [2025-06-12T07:46:13.247Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-06-12T07:46:13.247Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-06-12T07:46:13.289Z] [Firebase Plugin] User found:  shawn.shiobara@gmail.com
+[info] [Firebase Plugin] (Core:Project) New user detected, fetching projects
+[debug] [2025-06-12T07:46:13.290Z] Checked if tokens are valid: true, expires at: 1749717972247
+[debug] [2025-06-12T07:46:13.291Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=1000
+[debug] [2025-06-12T07:46:14.272Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 200
+[debug] [2025-06-12T07:46:14.272Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[info] [Firebase Plugin] Stopping Data Connect toolkit
+[warn] !  Data Connect Emulator has exited upon receiving signal: SIGKILL 
