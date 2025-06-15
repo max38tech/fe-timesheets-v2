@@ -5,13 +5,13 @@ import { getFirestore, type Firestore } from "firebase/firestore"; // Added Fire
 import { getStorage, type FirebaseStorage } from "firebase/storage"; // Added Storage import
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID, // Optional
+  apiKey: process.env.AIzaSyANGzoTb8oH3TFUW4rOtU5EU1hcWeaZYBE,
+  authDomain: process.env.fe-timesheets-29db8.firebaseapp.com,
+  projectId: process.env.fe-timesheets-29db8,
+  storageBucket: process.env.fe-timesheets-29db8.firebasestorage.app,
+  messagingSenderId: process.env.211160800558,
+  appId: process.env.1:211160800558:web:4914a7a45626e0c7a56ebf,
+  measurementId: process.env.G-SYMGJ10B8W, // Optional
 };
 
 // Initialize Firebase
