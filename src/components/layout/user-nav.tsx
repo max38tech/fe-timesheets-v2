@@ -91,7 +91,7 @@ export function UserNav() {
             <span className="ml-1 font-medium">{displayRole}</span>
           </DropdownMenuItem>
           {profileLink && (
-            <Link href={profileLink} passHref legacyBehavior>
+            <Link href={profileLink}>
               <DropdownMenuItem onClick={() => setIsMenuOpen(false)}> 
                 <Settings className="mr-2 h-4 w-4" />
                 <span>My Profile</span>

@@ -62,20 +62,22 @@ export default function AdminDashboardPage() {
             const IconComponent = iconMap[link.iconName];
             const ArrowIcon = iconMap["ArrowRight"];
             return (
-              <Link href={link.href} key={link.href} legacyBehavior>
-                <a className="block group transition-all duration-300 ease-in-out hover:scale-[1.02]">
-                  <Card className="h-full shadow-md hover:shadow-lg border border-transparent hover:border-primary/50">
-                    <CardContent className="p-6 flex flex-col items-start justify-between h-full">
-                      <div className="mb-auto"> {/* Pushes content above button to top */}
-                        {IconComponent && <IconComponent className="h-8 w-8 text-primary mb-3" />}
-                        <h3 className="text-lg font-semibold text-foreground mb-1">{link.label}</h3>
-                      </div>
-                      <Button variant="link" className="p-0 h-auto mt-3 text-sm text-primary group-hover:underline self-start">
-                        Go to {link.label.split(" ")[1]} {ArrowIcon && <ArrowIcon className="ml-1 h-4 w-4" />}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                </a>
+              <Link 
+                href={link.href} 
+                key={link.href} 
+                className="block group transition-all duration-300 ease-in-out hover:scale-[1.02]"
+              >
+                <Card className="h-full shadow-md hover:shadow-lg border border-transparent hover:border-primary/50">
+                  <CardContent className="p-6 flex flex-col items-start justify-between h-full">
+                    <div className="mb-auto">
+                      {IconComponent && <IconComponent className="h-8 w-8 text-primary mb-3" />}
+                      <h3 className="text-lg font-semibold text-foreground mb-1">{link.label}</h3>
+                    </div>
+                    <Button variant="link" className="p-0 h-auto mt-3 text-sm text-primary group-hover:underline self-start">
+                      Go to {link.label.split(" ")[1]} {ArrowIcon && <ArrowIcon className="ml-1 h-4 w-4" />}
+                    </Button>
+                  </CardContent>
+                </Card>
               </Link>
             );
           })}

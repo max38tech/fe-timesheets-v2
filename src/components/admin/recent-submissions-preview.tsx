@@ -107,11 +107,13 @@ export function RecentSubmissionsPreview() {
                 ))}
               </TableBody>
             </Table>
-            <Button variant="outline" size="sm" className="w-full" asChild>
-              <Link href="/admin/approvals" legacyBehavior>
-                View All Approvals <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+            <Link href="/admin/approvals">
+              <Button variant="outline" size="sm" className="w-full">
+                <span>
+                  View All Approvals <ArrowRight className="ml-2 h-4 w-4" />
+                </span>
+              </Button>
+            </Link>
           </div>
         )}
       </CardContent>
