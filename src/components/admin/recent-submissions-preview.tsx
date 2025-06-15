@@ -108,7 +108,7 @@ export function RecentSubmissionsPreview() {
               </TableBody>
             </Table>
             <Button variant="outline" size="sm" className="w-full" asChild>
-              <Link href="/admin/approvals">
+              <Link href="/admin/approvals" legacyBehavior>
                 View All Approvals <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>

@@ -235,7 +235,7 @@ export function ClientHoursChart() {
                   // The Bar component itself handles rendering based on dataKey and `fill` from chartConfig mapping or direct `fill` in data.
                   // This div structure for individual cells is not how recharts Bar works.
                   // Instead, ensure `fill` attribute in `ChartDataPoint` is correctly mapping colors.
-                  <div key={`cell-${index}`} style={{ backgroundColor: entry.fill }} />
+                  (<div key={`cell-${index}`} style={{ backgroundColor: entry.fill }} />)
                 ))}
               </Bar>
             </BarChart>

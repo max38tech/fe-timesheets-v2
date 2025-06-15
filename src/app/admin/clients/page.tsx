@@ -215,7 +215,6 @@ export default function ClientsPage() {
           Add New Client
         </Button>
       </div>
-
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Client Directory</CardTitle>
@@ -223,10 +222,10 @@ export default function ClientsPage() {
         </CardHeader>
         <CardContent>
           {isLoadingClients && !clients.length ? ( // Show main loader only if no clients loaded yet
-            <div className="flex items-center justify-center py-10">
+            (<div className="flex items-center justify-center py-10">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
               <p className="ml-2 text-muted-foreground">Loading clients...</p>
-            </div>
+            </div>)
           ) : error ? (
             <div className="flex flex-col items-center justify-center py-10 text-destructive">
               <AlertTriangle className="h-8 w-8 mb-2" />
@@ -335,13 +334,11 @@ export default function ClientsPage() {
           )}
         </CardContent>
       </Card>
-
       <AddClientDialog
         isOpen={isAddClientDialogOpen}
         onOpenChange={setIsAddClientDialogOpen}
         onClientAdded={handleClientAddedOrUpdated}
       />
-      
       {clientToEdit && (
         <EditClientDialog
           isOpen={isEditClientDialogOpen}
@@ -353,7 +350,6 @@ export default function ClientsPage() {
           }}
         />
       )}
-
       {currentClientForLocationAdd && (
         <AddLocationDialog
           isOpen={isAddLocationDialogOpen}
@@ -363,7 +359,6 @@ export default function ClientsPage() {
           onLocationAdded={() => handleLocationAddedOrUpdated(currentClientForLocationAdd.id)}
         />
       )}
-
       {locationToEdit && (
         <EditLocationDialog
             isOpen={isEditLocationDialogOpen}
@@ -375,7 +370,6 @@ export default function ClientsPage() {
             }}
         />
       )}
-
       {itemToDelete && (
         <ConfirmDeleteDialog
           isOpen={isConfirmDeleteDialogOpen}
