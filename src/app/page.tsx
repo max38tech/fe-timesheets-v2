@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { LogIn, UserCog } from "lucide-react";
@@ -10,10 +9,8 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-svh">
       <UnauthenticatedHeader />
-      <main className="flex flex-1 flex-col items-center justify-center bg-background p-4"> {/* Changed div to main, use flex-1 */}
-        <header className="mb-12 text-center pt-8"> {/* pt-8 might still be useful for spacing from top of this main area */}
-          {/* AppLogo is in UnauthenticatedHeader, can be removed here if redundant */}
-          {/* <AppLogo /> */}
+      <main className="flex flex-1 flex-col items-center justify-center bg-background p-4">
+        <header className="mb-12 text-center pt-8">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Welcome to FE Timesheets
           </h1>
@@ -34,11 +31,10 @@ export default function HomePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/login" legacyBehavior>
-                <Button className="w-full" size="lg">
-                  Technician Login
-                </Button>
-              </Link>
+              {/* CORRECTED PATTERN: Button wraps Link and uses asChild */}
+              <Button asChild className="w-full" size="lg">
+                <Link href="/login">Technician Login</Link>
+              </Button>
             </CardContent>
           </Card>
 
@@ -53,11 +49,10 @@ export default function HomePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Link href="/admin/login" legacyBehavior>
-                <Button className="w-full" variant="outline" size="lg">
-                  Admin Login
-                </Button>
-              </Link>
+              {/* CORRECTED PATTERN: Button wraps Link and uses asChild */}
+              <Button asChild className="w-full" variant="outline" size="lg">
+                <Link href="/admin/login">Admin Login</Link>
+              </Button>
             </CardContent>
           </Card>
         </div>
