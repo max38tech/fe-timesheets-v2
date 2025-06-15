@@ -100,7 +100,7 @@ export function TimeTracker({ isJobSelected, technicianId, clientId, locationId 
       const workDurationSeconds = Math.max(0, totalDurationSeconds - breakInSeconds);
 
       if (workDurationSeconds > 86400 * 2) { 
-        toast({ title: "Duration Too Long", description: "Calculated work duration seems excessively long (over 48 hours). Please check inputs.", variant: "warning" });
+        toast({ title: "Duration Too Long", description: "Calculated work duration seems excessively long (over 48 hours). Please check inputs.", variant: "default" });
       }
 
 
