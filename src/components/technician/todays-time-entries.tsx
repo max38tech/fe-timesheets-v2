@@ -11,7 +11,7 @@ import { CalendarIcon, Clock, Loader2, AlertTriangle, Edit3, Trash2, Lock } from
 import { format, parseISO, startOfDay, endOfDay } from 'date-fns';
 import { cn, formatDuration } from '@/lib/utils';
 import { db } from '@/lib/firebase';
-import { collection, query, where, orderBy, getDocs, type Timestamp, doc, deleteDoc } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, getDocs, type Timestamp, doc, deleteDoc } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
