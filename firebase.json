@@ -5,7 +5,10 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
-    ]
+    ],
+    "frameworksBackend": {
+      "region": "asia-northeast1"
+    }
   },
   "firestore": {
     "database": "(default)",
@@ -29,17 +32,6 @@
       ]
     }
   ],
-  "apphosting": {
-    "backendId": "fe-timesheets-app",
-    "rootDir": "/",
-    "ignore": [
-      "node_modules",
-      ".git",
-      "firebase-debug.log",
-      "firebase-debug.*.log",
-      "functions"
-    ]
-  },
   "storage": {
     "rules": "storage.rules"
   }
