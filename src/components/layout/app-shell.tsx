@@ -53,18 +53,16 @@ export function AppShell({ navItems, children, userRole }: AppShellProps) {
                 const IconComponent = iconComponents[item.iconName];
                 return (
                   <SidebarMenuItem key={item.href}>
-                    <Link href={item.href} legacyBehavior passHref>
-                      <SidebarMenuButton
+                    <SidebarMenuButton
                         asChild
                         isActive={pathname.startsWith(item.href)}
                         tooltip={item.tooltip}
                       >
-                        <a>
+                        <Link href={item.href}>
                           {IconComponent && <IconComponent />}
                           <span>{item.label}</span>
-                        </a>
-                      </SidebarMenuButton>
-                    </Link>
+                        </Link>
+                    </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
               })}

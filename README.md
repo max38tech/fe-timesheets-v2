@@ -1,5 +1,3 @@
-# Firebase Studio
+# FE Timesheets
 
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
+FE Timesheets is a SaaS solution for handling Field Engineer timesheets across multiple clients, locations, and technicians. 

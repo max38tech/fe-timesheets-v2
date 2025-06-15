@@ -15,7 +15,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/auth-context';
 import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp, query, where, orderBy, getDocs, type Timestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, where, orderBy, limit, getDocs, type Timestamp } from 'firebase/firestore';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
@@ -179,7 +179,6 @@ export default function TechnicianDashboardPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-8 text-foreground">Technician Dashboard</h1>
-      
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1 space-y-6">
           <Card className="shadow-md">
@@ -239,9 +238,7 @@ export default function TechnicianDashboardPage() {
           )}
         </div>
       </div>
-
       <Separator className="my-8" />
-
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Submit for Approval</CardTitle>
@@ -265,9 +262,7 @@ export default function TechnicianDashboardPage() {
            <p className="text-xs text-muted-foreground mt-2">Note: Actual time entries are saved when you clock out via the Time Tracker.</p>
         </CardContent>
       </Card>
-
       <Separator className="my-8" />
-
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">

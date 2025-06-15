@@ -131,12 +131,12 @@ export default function ApprovalsPage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-          <CheckCircle className="h-8 w-8 text-primary" />
-          Job Submissions for Approval
-        </h1>
-      </div>
+      <div className="flex items-center justify-between mb-8">
+       <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
+         <CheckCircle className="h-8 w-8 text-primary" />
+         Job Submissions for Approval
+       </h1>
+     </div>
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Submitted Work Orders</CardTitle>
