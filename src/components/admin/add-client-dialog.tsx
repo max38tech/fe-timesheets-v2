@@ -20,7 +20,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { db } from '@/lib/firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, doc, writeBatch } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
 
 //--> 1. Define a schema for a single location
@@ -73,14 +73,61 @@ export function AddClientDialog({ isOpen, onOpenChange, onClientAdded }: AddClie
   });
 
   const onSubmit: SubmitHandler<ClientFormValues> = async (data) => {
-    // We will update this logic in Phase 3
-    console.log(data); // For now, we'll just log the data
-    return; // And we'll stop the submission temporarily
+  setIsSubmitting(true);
+  // 1. Initialize a new batch write operation.
+  const batch = writeBatch(db);
+
+  try {
+    // 2. Create a reference for the new client document.
+    // This doesn't create the doc yet, it just prepares a reference with a unique ID.
+    const clientRef = doc(collection(db, 'clients'));
+
+    // 3. Add the "set client" operation to the batch.
+    batch.set(clientRef, {
+      name: data.name,
+      primaryContactName: data.primaryContactName,
+      primaryContactEmail: data.primaryContactEmail,
+    });
+
+    // 4. Loop through each location from the form data.
+    data.locations.forEach((location) => {
+      // Create a reference for a new location document.
+      const locationRef = doc(collection(db, 'locations'));
+      
+      // Add the "set location" operation to the batch.
+      batch.set(locationRef, {
+        name: location.name,
+        contactName: location.contactName,
+        contactEmail: location.contactEmail,
+        // 5. IMPORTANT: This links the location back to the new client.
+        clientId: clientRef.id, 
+      });
+    });
+
+    // 6. Commit the batch. This sends all the write operations to Firestore at once.
+    await batch.commit();
+
+    toast({
+      title: "Client and Locations Added",
+      description: `Client "${data.name}" has been successfully added with ${data.locations.length} location(s).`,
+    });
     
-    // The old code below will be replaced later
-    setIsSubmitting(true);
-    // ...
-  };
+    // Reset and close the dialog on success.
+    onClientAdded();
+    reset();
+    onOpenChange(false);
+
+  } catch (error) {
+    console.error("Error adding client and locations:", error);
+    toast({
+      title: "Error",
+      description: "Could not add client. Please try again.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 // end phase 1, top of file paste
 
   // Reset form when dialog is closed or opened
