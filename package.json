@@ -45,13 +45,13 @@
     "firebase": "^11.9.1",
     "firebase-tools": "^14.7.0",
     "lucide-react": "^0.516.0",
-    "next": "^14.2.30",
+    "next": "^15.3.3",
     "next-themes": "^0.4.6",
     "next.js": "^1.0.3",
     "patch-package": "^8.0.0",
-    "react": "^18.3.1",
+    "react": "^19.1.0",
     "react-day-picker": "^9.7.0",
-    "react-dom": "^18.3.1",
+    "react-dom": "^19.1.0",
     "react-hook-form": "^7.58.0",
     "recharts": "^2.15.3",
     "tailwind-merge": "^3.3.1",
@@ -59,12 +59,12 @@
     "zod": "^3.25.67"
   },
   "devDependencies": {
-    "@types/node": "^24",
-    "@types/react": "^19",
+    "@types/node": "^24.0.3",
+    "@types/react": "^19.1.8",
     "@types/react-dom": "^19",
     "genkit-cli": "^1.12.0",
     "postcss": "^8",
     "tailwindcss": "^4.1.10",
-    "typescript": "^5"
+    "typescript": "^5.8.3"
   }
 }
