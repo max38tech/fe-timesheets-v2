@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
 import { AuthProvider } from "@/context/auth-context"; // Added AuthProvider
+import { cn } from "@/lib/utils" //added as requested by Claude
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
