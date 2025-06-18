@@ -51,6 +51,7 @@ interface ReportRow {
 
 export default function ReportsPage() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  // Removed click tracking ref; open/close handled in onSelect
     const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false); // For date picker popover
   const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>("all");
   const [selectedClientId, setSelectedClientId] = useState<string>("all");
@@ -492,9 +493,14 @@ export default function ReportsPage() {
               <label htmlFor="date-range-picker" className="block text-sm font-medium text-muted-foreground mb-1">
                 Date Range
               </label>
-              <Popover open={isDatePopoverOpen} onOpenChange={(open) => {
-                  // Prevent closing popover until both dates selected
-                  if (!open && dateRange?.from && !dateRange?.to) {
+              <Popover open={isDatePopoverOpen} onOpenChange={(open) => { if (open) setIsDatePopoverOpen(true); }}>
+                  // allow opening
+                  if (open) {
+                      setIsDatePopoverOpen(true);
+                      return;
+                  }
+                  // prevent closing when only start date selected
+                  if (!open && dateRange?.from && !dateRange.to) {
                       return;
                   }
                   setIsDatePopoverOpen(open);
@@ -534,7 +540,9 @@ export default function ReportsPage() {
                       setDateRange(range);
                       if (range?.from && range.to) {
                         resetReportState();
-                        setIsDatePopoverOpen(false); 
+                        setIsDatePopoverOpen(false);
+                      } else {
+                        setIsDatePopoverOpen(true);
                       }
                     }}
                     numberOfMonths={2}
