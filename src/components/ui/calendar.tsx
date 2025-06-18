@@ -35,7 +35,7 @@ function Calendar({
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
         // --- This is the new CSS Grid implementation ---
-        table: "w-full border-collapse",
+        table: "grid w-full border-collapse",
         head_row: "grid grid-cols-7",
         head_cell: "text-muted-foreground rounded-md w-9 justify-center font-normal text-[0.8rem] grid place-items-center",
         row: "grid grid-cols-7",
