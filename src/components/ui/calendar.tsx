@@ -35,10 +35,13 @@ function Calendar({
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
         // --- This is the new CSS Grid implementation ---
-        table: "grid grid-cols-7 w-full gap-y-2",
+        table: "grid grid-cols-7 w-full border-collapse",
+        head: "contents",
         head_row: "contents",
-        head_cell: "text-muted-foreground rounded-md w-9 justify-center font-normal text-[0.8rem] flex items-center justify-center",
+        head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] grid place-items-center",
+        body: "contents",
         row: "contents",
+        cell: "h-9 w-9 grid place-items-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
         cell: "h-9 w-9 text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20 flex items-center justify-center text-center",
         // --- End of new Grid implementation ---
         day: cn(
