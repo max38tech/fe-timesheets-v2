@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { User } from "firebase/auth";
@@ -6,11 +5,11 @@ import { onAuthStateChanged, signOut as firebaseSignOut } from "firebase/auth";
 import React, { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { auth, db } from "@/lib/firebase"; 
 import { doc, getDoc, type DocumentData } from "firebase/firestore"; 
-import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
+// No 'useToast' import here anymore
+
 interface AppUser extends User {
-  // displayName is already part of User, but we ensure our context prioritizes Firestore's version
   role?: string | null;
   status?: 'active' | 'archived' | null; 
 }
@@ -30,7 +29,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [userStatus, setUserStatus] = useState<'active' | 'archived' | null>(null); 
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
@@ -42,22 +40,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data() as DocumentData;
-            const firestoreDisplayName = userData.displayName || user.displayName; // Prioritize Firestore displayName
             const firestoreRole = userData.role || null;
             const firestoreStatus = userData.status || 'active'; 
             
             if (firestoreStatus === 'archived') {
               await firebaseSignOut(auth);
-              setCurrentUser(null);
-              setUserRole(null);
-              setUserStatus(null);
-              toast({ title: "Account Archived", description: "This account has been archived and cannot be accessed.", variant: "destructive" });
-              router.push("/"); 
             } else {
-              // Construct the AppUser object, prioritizing Firestore data
               const appUser: AppUser = {
-                ...user, // Base Firebase Auth user object
-                displayName: firestoreDisplayName, // Override with Firestore display name
+                ...user,
+                displayName: userData.displayName || user.displayName,
                 role: firestoreRole,
                 status: firestoreStatus,
               };
@@ -66,23 +57,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               setUserStatus(firestoreStatus);
             }
           } else {
-            console.warn(`User document for UID ${user.uid} not found or role/status not set in Firestore.`);
-            await firebaseSignOut(auth); 
-            setCurrentUser(null); 
-            setUserRole(null);
-            setUserStatus(null);
-            toast({ title: "Access Denied", description: "User profile not found or not configured correctly.", variant: "destructive" });
-            router.push("/");
+            console.warn(`User document for UID ${user.uid} not found.`);
+            await firebaseSignOut(auth);
           }
         } catch (error) {
-          console.error("Error fetching user role/status/displayName from Firestore:", error);
-          // Fallback to basic user object if Firestore fetch fails, but log out as profile is incomplete
+          console.error("Error fetching user data from Firestore:", error);
            await firebaseSignOut(auth);
-           setCurrentUser(null);
-           setUserRole(null);
-           setUserStatus(null);
-           toast({ title: "Authentication Error", description: "Could not verify user details. Please try again.", variant: "destructive" });
-           router.push("/");
         }
       } else {
         setCurrentUser(null);
@@ -93,21 +73,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => unsubscribe();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); 
+  }, []); // This is the single, correct closing for the useEffect hook.
 
   const logout = async () => {
-    try {
-      await firebaseSignOut(auth);
-      setCurrentUser(null); 
-      setUserRole(null);    
-      setUserStatus(null); 
-      toast({ title: "Logged Out", description: "You have been successfully logged out." });
-      router.push("/"); 
-    } catch (error) {
-      console.error("Error signing out: ", error);
-      toast({ title: "Logout Error", description: "Failed to log out. Please try again.", variant: "destructive" });
-    }
+    // The logout function now ONLY handles signing out
+    await firebaseSignOut(auth);
   };
 
   const value = {
@@ -120,7 +90,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   return <AuthContext.Provider value={value}>{!loading && children}</AuthContext.Provider>;
 };
-
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (context === undefined) {

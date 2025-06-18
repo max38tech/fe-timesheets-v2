@@ -22,27 +22,38 @@ export const metadata: Metadata = {
   description: 'Technician Time Tracking & Management System',
 };
 
+// Inside src/app/layout.tsx
+
+// Inside src/app/layout.tsx
+
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <ThemeProvider
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          fontSans.variable,
+          fontMono.variable
+        )}
+      >
+        {/* We are commenting out the providers to see if one of them is the cause */}
+        {/* <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
-        >
-          <AuthProvider> {/* Added AuthProvider */}
-            <SidebarProvider defaultOpen>
+        > */}
+          {/* <AuthProvider> */}
+            {/* <SidebarProvider> */}
               {children}
-            </SidebarProvider>
-            <Toaster />
-          </AuthProvider> {/* Added AuthProvider */}
-        </ThemeProvider>
+              {/* <Toaster /> */}
+            {/* </SidebarProvider> */}
+          {/* </AuthProvider> */}
+        {/* </ThemeProvider> */}
       </body>
     </html>
   );

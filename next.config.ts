@@ -2,7 +2,7 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  output: 'standalone', // Add this for optimal serverful deployments
+  // output: 'standalone', // Add this for optimal serverful deployments
   /* config options here */
   typescript: {
     ignoreBuildErrors: true,
@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       }
+      
     ],
   },
 };

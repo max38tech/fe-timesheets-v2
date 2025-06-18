@@ -10,8 +10,8 @@
  * - SuggestTaskPromptsOutput - The output type for the suggestTaskPrompts function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+//import {ai} from '@/ai/genkit';
+//import {z} from 'genkit';
 
 const SuggestTaskPromptsInputSchema = z.object({
   client: z.string().describe('The name of the client.'),
