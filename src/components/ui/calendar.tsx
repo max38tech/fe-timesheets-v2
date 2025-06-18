@@ -9,48 +9,28 @@ import { buttonVariants } from "@/components/ui/button";
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>;
 
-function Calendar({
-  className,
-  classNames,
-  showOutsideDays = true,
-  ...props
-}: CalendarProps) {
+function Calendar({ className, classNames, ...props }: CalendarProps) {
   return (
     <DayPicker
-      showOutsideDays={showOutsideDays}
+      {...props}
       className={cn("p-3", className)}
       classNames={{
-        months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
-        month: "space-y-4",
-        caption: "flex justify-center items-center relative",
-        caption_label: "text-sm font-medium",
-        nav: "flex justify-between items-center",
-        nav_button: cn(
-          buttonVariants({ variant: "outline" }),
-          "h-7 w-7 p-0 opacity-50 hover:opacity-100"
-        ),
-        nav_button_previous: "",
-        nav_button_next: "",
-        table: "w-full border-collapse",
-        head_row: "flex",
-        head_cell: "w-9 text-center font-normal text-[0.8rem] text-muted-foreground",
-        row: "flex mt-2",
-        cell: cn(
+        // Use default table, head, and row layouts and only override day styling
+        day: cn(
           buttonVariants({ variant: "ghost" }),
-          "h-9 w-9 p-0 font-normal flex items-center justify-center text-sm " +
-            "aria-selected:bg-accent aria-selected:text-accent-foreground focus:z-20 relative"
+          "h-9 w-9 p-0 font-normal"
         ),
-        day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
+        day_selected:
+          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         day_today: "bg-accent text-accent-foreground",
         day_outside: "text-muted-foreground opacity-50",
         day_disabled: "text-muted-foreground opacity-50",
         ...classNames,
       }}
       components={{
-        IconLeft: (props) => <ChevronLeft className="h-4 w-4" {...props} />,
-        IconRight: (props) => <ChevronRight className="h-4 w-4" {...props} />,
+        IconLeft: (props) => <ChevronLeft className="h-4 w-4" {...props} />,  
+        IconRight: (props) => <ChevronRight className="h-4 w-4" {...props} />,  
       }}
-      {...props}
     />
   );
 }
