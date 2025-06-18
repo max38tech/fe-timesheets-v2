@@ -8,13 +8,14 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BarChart3, CalendarIcon, Loader2, AlertTriangle, Search, Download, Users, Briefcase, MapPin } from "lucide-react";
-import { format, type DateRange, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
++import type { DateRange } from "@/components/ui/calendar";
 import { cn, formatDuration } from "@/lib/utils";
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc, type Timestamp, orderBy, type QueryConstraint } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { EmployeeProfile } from '@/app/admin/employees/page'; 
+import type { EmployeeProfile } from '@/app/admin/(protected)/employees/page'; 
 
 interface Client {
   id: string;
@@ -493,18 +494,16 @@ export default function ReportsPage() {
               <label htmlFor="date-range-picker" className="block text-sm font-medium text-muted-foreground mb-1">
                 Date Range
               </label>
-              <Popover open={isDatePopoverOpen} onOpenChange={(open) => { if (open) setIsDatePopoverOpen(true); }}>
-                  // allow opening
-                  if (open) {
-                      setIsDatePopoverOpen(true);
-                      return;
-                  }
-                  // prevent closing when only start date selected
-                  if (!open && dateRange?.from && !dateRange.to) {
-                      return;
-                  }
-                  setIsDatePopoverOpen(open);
-              }}>
+              <Popover
+              open={isDatePopoverOpen}
+              onOpenChange={(open: boolean) => {
+              // keep popover open until both dates are selected
+              if (!open && dateRange?.from && !dateRange?.to) {
+              return;
+              }
+              setIsDatePopoverOpen(open);
+              }}
+              >
                 <PopoverTrigger asChild>
                   <Button
                     id="date-range-picker"
