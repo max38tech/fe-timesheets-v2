@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -52,6 +52,7 @@ interface ReportRow {
 export default function ReportsPage() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false); // For date picker popover
++  const rangeClickCount = React.useRef(0);
   const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>("all");
   const [selectedClientId, setSelectedClientId] = useState<string>("all");
   const [selectedLocationId, setSelectedLocationId] = useState<string>("all");
@@ -492,7 +493,14 @@ export default function ReportsPage() {
               <label htmlFor="date-range-picker" className="block text-sm font-medium text-muted-foreground mb-1">
                 Date Range
               </label>
-              <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
+              <Popover open={isDatePopoverOpen} onOpenChange={(open) => {
+                  // Prevent closing popover on first date click in range mode
+                  if (!open && dateRange?.from && !dateRange?.to) {
+                    return; // ignore close
+                  }
+                  if (open) rangeClickCount.current = 0;
+                  setIsDatePopoverOpen(open);
+              }}>
                 <PopoverTrigger asChild>
                   <Button
                     id="date-range-picker"
