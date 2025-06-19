@@ -21,7 +21,8 @@ import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { db, auth } from '@/lib/firebase'; 
 import { doc, setDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, type AuthError } from 'firebase/auth'; 
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import type { FirebaseError } from 'firebase/app'; 
 import { Loader2, Info } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -88,26 +89,31 @@ export function AddEmployeeDialog({ isOpen, onOpenChange, onEmployeeAdded }: Add
       onOpenChange(false);
     } catch (error) {
       const authError = error as AuthError;
-      console.error("Error adding employee:", authError);
       let friendlyMessage = "Could not add employee. Please try again.";
+      // Handle known Firebase Auth errors
       if (authError.code) {
-        switch (authError.code) {
-          case 'auth/email-already-in-use':
-            friendlyMessage = 'This email address is already in use. Please use a different email.';
-            setError("email", { type: "manual", message: friendlyMessage });
-            break;
-          case 'auth/weak-password':
-            friendlyMessage = 'The password is too weak. It must be at least 6 characters long.';
-             setError("password", { type: "manual", message: friendlyMessage });
-            break;
-          case 'auth/invalid-email':
-            friendlyMessage = 'The email address is not valid.';
-            setError("email", { type: "manual", message: friendlyMessage });
-            break;
-          default:
-            friendlyMessage = `An error occurred: ${authError.message}`;
+        if (authError.code === 'auth/email-already-in-use') {
+          friendlyMessage = 'This email address is already in use. Please use a different email.';
+          setError("email", { type: "manual", message: friendlyMessage });
+          setIsSubmitting(false);
+          return; // Stop further execution
         }
+        if (authError.code === 'auth/weak-password') {
+          friendlyMessage = 'The password is too weak. It must be at least 6 characters long.';
+          setError("password", { type: "manual", message: friendlyMessage });
+          setIsSubmitting(false);
+          return;
+        }
+        if (authError.code === 'auth/invalid-email') {
+          friendlyMessage = 'The email address is not valid.';
+          setError("email", { type: "manual", message: friendlyMessage });
+          setIsSubmitting(false);
+          return;
+        }
+        // Fallback for other errors
+        friendlyMessage = `An error occurred: ${authError.message}`;
       }
+      console.error("Error adding employee:", authError);
       toast({
         title: "Error Adding Employee",
         description: friendlyMessage,
