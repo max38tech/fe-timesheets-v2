@@ -21,8 +21,7 @@ import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { db, auth } from '@/lib/firebase'; 
 import { doc, setDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import type { FirebaseError } from 'firebase/app'; 
+import { createUserWithEmailAndPassword, type AuthError } from 'firebase/auth'; 
 import { Loader2, Info } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
