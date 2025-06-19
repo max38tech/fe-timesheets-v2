@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { LayoutDashboard, Users, Briefcase, Clock, BarChart3, CheckCircle } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, Clock, BarChart3, CheckCircle, User } from "lucide-react";
 
 export type NavItem = {
   href: string;
@@ -18,6 +18,7 @@ export const iconComponentsMap = {
   Clock,
   BarChart3,
   CheckCircle,
+  User,
 };
 
 export const technicianNavItems: NavItem[] = [
@@ -26,6 +27,12 @@ export const technicianNavItems: NavItem[] = [
     iconName: "LayoutDashboard",
     label: "Dashboard",
     tooltip: "Dashboard",
+  },
+  {
+    href: "/technician/profile",
+    iconName: "User",
+    label: "My Profile",
+    tooltip: "Edit Profile & Avatar",
   },
 ];
 
@@ -65,5 +72,11 @@ export const adminNavItems: NavItem[] = [
     iconName: "CheckCircle",
     label: "Approvals",
     tooltip: "Manage Approvals",
+  },
+  {
+    href: "/admin/profile",
+    iconName: "User",
+    label: "My Profile",
+    tooltip: "Edit Profile & Avatar",
   },
 ];

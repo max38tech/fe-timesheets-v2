@@ -17,7 +17,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { LayoutDashboard, Users, Briefcase, Clock, BarChart3, CheckCircle, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Users, Briefcase, Clock, BarChart3, CheckCircle, User, type LucideIcon } from "lucide-react";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 
 interface AppShellProps {
@@ -33,6 +33,7 @@ const iconComponents: Record<string, LucideIcon> = {
   Clock,
   BarChart3,
   CheckCircle,
+  User,
 };
 
 export function AppShell({ navItems, children, userRole }: AppShellProps) {

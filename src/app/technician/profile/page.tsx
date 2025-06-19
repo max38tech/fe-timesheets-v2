@@ -153,19 +153,39 @@ export default function TechnicianProfilePage() {
       toast({ title: "No File Selected or Session Error", description: "Please select an image file to upload and ensure you are logged in.", variant: "destructive" });
       return;
     }
+    
+    console.log("Upload Debug Info:");
+    console.log("- Current User UID:", currentUser.uid);
+    console.log("- Auth Current User UID:", auth.currentUser.uid);
+    console.log("- User Email:", currentUser.email);
+    console.log("- Auth Token:", await auth.currentUser.getIdToken());
+    console.log("- Selected File:", selectedFile.name, selectedFile.type, selectedFile.size);
+    
     setIsUploadingPhoto(true);
     const storage = getStorage(); 
     const fileExtension = selectedFile.name.split('.').pop();
     const fileName = `profile_photo.${fileExtension}`;
-    const imageRef = storageRef(storage, `profileImages/${currentUser.uid}/${fileName}`);
+    const uploadPath = `profileImages/${currentUser.uid}/${fileName}`;
+    console.log("- Upload Path:", uploadPath);
+    
+    const imageRef = storageRef(storage, uploadPath);
 
     try {
+      console.log("Attempting upload...");
       await uploadBytes(imageRef, selectedFile);
+      console.log("Upload successful, getting download URL...");
+      
       const downloadURL = await getDownloadURL(imageRef);
+      console.log("Download URL obtained:", downloadURL);
 
+      console.log("Updating Firebase Auth profile...");
       await updateProfile(auth.currentUser, { photoURL: downloadURL });
+      console.log("Firebase Auth profile updated successfully");
+      
+      console.log("Updating Firestore user document...");
       const userDocRef = doc(db, 'users', currentUser.uid);
       await updateDoc(userDocRef, { photoURL: downloadURL });
+      console.log("Firestore user document updated successfully");
 
       setCurrentPhotoURL(downloadURL);
       setSelectedFile(null);
@@ -173,9 +193,33 @@ export default function TechnicianProfilePage() {
       if (photoInput) photoInput.value = "";
 
       toast({ title: "Profile Photo Updated", description: "Your new profile photo has been uploaded." });
-    } catch (error) {
-      console.error("Error uploading profile photo:", error);
-      toast({ title: "Upload Failed", description: "Could not upload profile photo. Please try again.", variant: "destructive" });
+    } catch (error: any) {
+      console.error("Error during profile photo process:", error);
+      console.error("Error code:", error.code);
+      console.error("Error message:", error.message);
+      console.error("Full error:", error);
+      
+      // Even if there's an error, the upload might have succeeded
+      // Let's try to get the download URL to update the UI
+      try {
+        console.log("Attempting to get download URL despite error...");
+        const downloadURL = await getDownloadURL(imageRef);
+        console.log("Got download URL after error:", downloadURL);
+        setCurrentPhotoURL(downloadURL);
+        
+        toast({ 
+          title: "Photo Uploaded", 
+          description: "Photo uploaded successfully, but there was an issue updating your profile. Please refresh the page.", 
+          variant: "default" 
+        });
+      } catch (urlError) {
+        console.error("Could not get download URL:", urlError);
+        toast({ 
+          title: "Upload Failed", 
+          description: `Could not upload profile photo: ${error.message || error.code || 'Unknown error'}`, 
+          variant: "destructive" 
+        });
+      }
     } finally {
       setIsUploadingPhoto(false);
     }
