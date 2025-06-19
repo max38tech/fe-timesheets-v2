@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -8,7 +7,8 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BarChart3, CalendarIcon, Loader2, AlertTriangle, Search, Download, Users, Briefcase, MapPin } from "lucide-react";
-import { format, type DateRange, parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
+import type { DateRange } from "@/components/ui/calendar";
 import { cn, formatDuration } from "@/lib/utils";
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc, type Timestamp, orderBy, type QueryConstraint } from 'firebase/firestore';
@@ -492,7 +492,14 @@ export default function ReportsPage() {
               <label htmlFor="date-range-picker" className="block text-sm font-medium text-muted-foreground mb-1">
                 Date Range
               </label>
-              <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
+              <Popover open={isDatePopoverOpen} onOpenChange={(open) => {
+                  // Prevent closing popover on first date click in range mode
+                  if (!open && dateRange?.from && !dateRange?.to) {
+                    return; // ignore close
+                  }
+                  if (open) rangeClickCount.current = 0;
+                  setIsDatePopoverOpen(open);
+              }}>
                 <PopoverTrigger asChild>
                   <Button
                     id="date-range-picker"
@@ -642,4 +649,3 @@ export default function ReportsPage() {
     </div>
   );
 }
-    

@@ -1,18 +1,18 @@
-
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { ThemeProvider } from "@/components/theme/theme-provider";
-import { AuthProvider } from "@/context/auth-context"; // Added AuthProvider
+import { AuthProvider } from "@/context/auth-context";
+import { cn } from "@/lib/utils";
 
-const geistSans = Geist({
+const fontSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
 });
 
-const geistMono = Geist_Mono({
+const fontMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
 });
@@ -24,24 +24,30 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          fontSans.variable,
+          fontMono.variable
+        )}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider> {/* Added AuthProvider */}
-            <SidebarProvider defaultOpen>
+          <AuthProvider>
+            <SidebarProvider>
               {children}
+              <Toaster />
             </SidebarProvider>
-            <Toaster />
-          </AuthProvider> {/* Added AuthProvider */}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

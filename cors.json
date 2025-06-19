@@ -1,0 +1,11 @@
+[
+  {
+    "origin": [
+      "https://fe-timesheets-29db8.web.app",
+      "http://localhost:3000",
+      "http://localhost:9002"
+    ],
+    "method": ["GET"],
+    "maxAgeSeconds": 3600
+  }
+]
