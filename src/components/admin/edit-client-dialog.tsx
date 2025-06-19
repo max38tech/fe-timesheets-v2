@@ -96,9 +96,80 @@ export function EditClientDialog({ isOpen, onOpenChange, client, onClientUpdated
   }, [client, isOpen, reset]);
   
   const onSubmit: SubmitHandler<ClientFormValues> = async (data) => {
-    // We will implement the complex update logic in the next step.
-    console.log("Submitting updated data:", data);
-    alert("Save logic not implemented yet.");
+    if (!client) {
+      toast({
+        title: "Error",
+        description: "No client selected to update.",
+        variant: "destructive",
+      });
+      return;
+    }
+    setIsSubmitting(true);
+    try {
+      const batch = writeBatch(db);
+      const clientDocRef = doc(db, 'clients', client.id);
+
+      // Update client document
+      batch.update(clientDocRef, {
+        name: data.name,
+        primaryContactName: data.primaryContactName || null,
+        primaryContactEmail: data.primaryContactEmail || null,
+      });
+
+      // Handle locations updates
+      const existingLocationIds = client.locations.map(loc => loc.id);
+      const submittedLocationIds = data.locations.map(loc => loc.id).filter(id => id !== undefined) as string[];
+
+      // Locations to remove (existing but not submitted)
+      const locationsToRemove = existingLocationIds.filter(id => !submittedLocationIds.includes(id));
+
+      // Remove deleted locations
+      locationsToRemove.forEach(locationId => {
+        const locationDocRef = doc(db, 'locations', locationId);
+        batch.delete(locationDocRef);
+      });
+
+      // Add or update locations
+      for (const loc of data.locations) {
+        if (loc.id) {
+          // Update existing location
+          const locationDocRef = doc(db, 'locations', loc.id);
+          batch.update(locationDocRef, {
+            name: loc.name,
+            contactName: loc.contactName || null,
+            contactEmail: loc.contactEmail || null,
+          });
+        } else {
+          // Add new location
+          const locationsCollectionRef = collection(db, 'locations');
+          const newLocationRef = doc(locationsCollectionRef);
+          batch.set(newLocationRef, {
+            name: loc.name,
+            contactName: loc.contactName || null,
+            contactEmail: loc.contactEmail || null,
+            clientId: client.id,
+          });
+        }
+      }
+
+      await batch.commit();
+
+      toast({
+        title: "Client Updated",
+        description: `Client "${data.name}" and locations have been successfully updated.`,
+      });
+      onClientUpdated();
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error updating client:", error);
+      toast({
+        title: "Error",
+        description: "Could not update client. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

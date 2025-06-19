@@ -217,7 +217,6 @@ export default function TechnicianDashboardPage() {
       </div>
       <Separator className="my-8" />
       {/* Submit and submissions table unchanged */}
-      ... (rest of file unchanged) ...
     </div>
   );
 }

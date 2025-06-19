@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { JobSubmission } from "@/app/admin/approvals/page"; // Use type import
+/* Removed import of JobSubmission type due to missing module */
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { format, parseISO } from "date-fns";
+import { format, parseISO, startOfDay, endOfDay } from "date-fns";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Loader2, ThumbsUp, ThumbsDown, AlertTriangle, ClockIcon, Hourglass } from "lucide-react";
@@ -28,6 +28,19 @@ interface TimeEntry {
   endTime: string;   // ISO string
   totalBreakDurationSeconds: number;
   workDurationSeconds: number;
+}
+
+interface JobSubmission {
+  id: string;
+  clientId: string;
+  clientName: string;
+  locationId: string;
+  locationName: string;
+  technicianId: string;
+  technicianEmail?: string;
+  taskNotes?: string;
+  status?: string;
+  submittedAt?: Date;
 }
 
 interface SubmissionDetailsDialogProps {
@@ -72,14 +85,17 @@ export function SubmissionDetailsDialog({
           return;
         }
 
-        const submissionDate = format(submission.submittedAt, 'yyyy-MM-dd');
         const timeEntriesCollectionRef = collection(db, 'timeEntries');
+        const dayStart = startOfDay(submission.submittedAt);
+        const dayEnd = endOfDay(submission.submittedAt);
         const q = query(
           timeEntriesCollectionRef,
           where('technicianId', '==', submission.technicianId),
           where('clientId', '==', submission.clientId),
           where('locationId', '==', submission.locationId),
-          where('entryDate', '==', submissionDate),
+          where('entryDate', '>=', format(dayStart, 'yyyy-MM-dd')),
+          where('entryDate', '<=', format(dayEnd, 'yyyy-MM-dd')),
+          orderBy('entryDate', 'asc'),
           orderBy('startTime', 'asc')
         );
         const querySnapshot = await getDocs(q);
@@ -163,7 +179,7 @@ export function SubmissionDetailsDialog({
             <div className="grid grid-cols-3 items-center gap-4">
               <span className="text-sm font-medium text-muted-foreground">Status:</span>
               <div className="col-span-2">
-                <Badge variant={getStatusBadgeVariant(submission.status)}>
+                <Badge variant={getStatusBadgeVariant(submission.status || '')}>
                   {(submission.status || 'UNKNOWN').replace(/_/g, ' ').toUpperCase()}
                 </Badge>
               </div>
