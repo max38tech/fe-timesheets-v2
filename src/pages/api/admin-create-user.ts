@@ -17,27 +17,12 @@ export default async function handler(
 
   const { email, password, displayName, role } = req.body;
 
-  // TODO: verify the caller is an admin
-
   try {
-    // Create user in Firebase Auth
-    const userRecord = await authAdmin.createUser({
-      email,
-      password,
-      displayName,
-    });
-
-    // Create user profile in Firestore
-    await dbAdmin.collection('users').doc(userRecord.uid).set({
-      displayName,
-      email,
-      role,
-      status: 'active',
-    });
-
+    const userRecord = await authAdmin.createUser({ email, password, displayName });
+    await dbAdmin.collection('users').doc(userRecord.uid).set({ displayName, email, role, status: 'active' });
     return res.status(200).json({ uid: userRecord.uid });
   } catch (e: any) {
-    console.error('Error in adminCreateUser:', e);
+    console.error('adminCreateUser error:', e);
     return res.status(400).json({ code: e.code, message: e.message });
   }
 }

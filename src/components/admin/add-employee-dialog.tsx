@@ -51,7 +51,7 @@ export function AddEmployeeDialog({ isOpen, onOpenChange, onEmployeeAdded }: Pro
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsSubmitting(true);
     try {
-      const res = await fetch('/api/adminCreateUser', {
+      const res = await fetch('/api/admin-create-user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
