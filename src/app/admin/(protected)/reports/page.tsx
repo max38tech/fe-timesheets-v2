@@ -8,13 +8,12 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BarChart3, CalendarIcon, Loader2, AlertTriangle, Search, Download, Users, Briefcase, MapPin } from "lucide-react";
 import { format, parseISO } from "date-fns";
-import type { DateRange } from "@/components/ui/calendar";
 import { cn, formatDuration } from "@/lib/utils";
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc, type Timestamp, orderBy, type QueryConstraint } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import type { EmployeeProfile } from '@/app/admin/employees/page'; 
+import type { EmployeeProfile } from '@/app/admin/(protected)/employees/page'; 
 
 interface Client {
   id: string;
@@ -52,7 +51,7 @@ interface ReportRow {
 export default function ReportsPage() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false); // For date picker popover
-  const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>("all");
+    const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>("all");
   const [selectedClientId, setSelectedClientId] = useState<string>("all");
   const [selectedLocationId, setSelectedLocationId] = useState<string>("all");
 
@@ -492,14 +491,7 @@ export default function ReportsPage() {
               <label htmlFor="date-range-picker" className="block text-sm font-medium text-muted-foreground mb-1">
                 Date Range
               </label>
-              <Popover open={isDatePopoverOpen} onOpenChange={(open) => {
-                  // Prevent closing popover on first date click in range mode
-                  if (!open && dateRange?.from && !dateRange?.to) {
-                    return; // ignore close
-                  }
-                  if (open) rangeClickCount.current = 0;
-                  setIsDatePopoverOpen(open);
-              }}>
+              <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     id="date-range-picker"
@@ -525,7 +517,20 @@ export default function ReportsPage() {
                     )}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent
+  className="w-auto p-0"
+  align="start"
+  onPointerDownOutside={(e) => {
+    if (!dateRange?.to) {
+      e.preventDefault();
+    }
+  }}
+  onEscapeKeyDown={(e) => {
+    if (!dateRange?.to) {
+      e.preventDefault();
+    }
+  }}
+>
                   <Calendar
                     initialFocus
                     mode="range"
