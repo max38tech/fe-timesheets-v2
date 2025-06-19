@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { BarChart3, CalendarIcon, Loader2, AlertTriangle, Search, Download, Users, Briefcase, MapPin } from "lucide-react";
 import { format, parseISO } from "date-fns";
-+import type { DateRange } from "@/components/ui/calendar";
+import { DateRange } from "@/components/ui/calendar";
 import { cn, formatDuration } from "@/lib/utils";
 import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, doc, getDoc, type Timestamp, orderBy, type QueryConstraint } from 'firebase/firestore';
