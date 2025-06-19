@@ -10,296 +10,206 @@ import { BarChart3, CalendarIcon, Loader2, AlertTriangle, Search, Download, User
 import { format, parseISO } from "date-fns";
 import { cn, formatDuration } from "@/lib/utils";
 import { db } from '@/lib/firebase';
-import { collection, query, where, getDocs, doc, getDoc, type Timestamp, orderBy, type QueryConstraint } from 'firebase/firestore';
+import { collection, query, where, orderBy, getDocs, doc, getDoc, QueryConstraint } from 'firebase/firestore';
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { EmployeeProfile } from '@/app/admin/(protected)/employees/page';
 
-interface Client {
-  id: string;
-  name: string;
-}
-
-interface Location {
-  id: string;
-  name: string;
-  clientId: string;
-}
-
-interface TimeEntry {
-  id: string;
-  entryDate: string; // YYYY-MM-DD
-  startTime: string; // ISO string
-  endTime: string;   // ISO string
-  workDurationSeconds: number;
-  clientId: string;
-  locationId: string;
-  technicianId: string;
-}
-
-interface ReportRow {
-  id: string;
-  entryDate: string;
-  clientName: string;
-  locationName: string;
-  technicianNameOrEmail: string;
-  startTimeFormatted: string;
-  endTimeFormatted: string;
-  workDurationFormatted: string;
-}
+interface Client { id: string; name: string; }
+interface Location { id: string; name: string; clientId: string; }
+interface TimeEntry { id: string; entryDate: string; startTime: string; endTime: string; workDurationSeconds: number; clientId: string; locationId: string; technicianId: string; }
+interface ReportRow { id: string; entryDate: string; clientName: string; locationName: string; technicianName: string; startTimeFormatted: string; endTimeFormatted: string; durationFormatted: string; }
 
 export default function ReportsPage() {
   // Date filters
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
-  const [isStartPickerOpen, setIsStartPickerOpen] = useState(false);
-  const [isEndPickerOpen, setIsEndPickerOpen] = useState(false);
+  const [startOpen, setStartOpen] = useState(false);
+  const [endOpen, setEndOpen] = useState(false);
 
   // Other filters
-  const [selectedTechnicianId, setSelectedTechnicianId] = useState<string>("all");
-  const [selectedClientId, setSelectedClientId] = useState<string>("all");
-  const [selectedLocationId, setSelectedLocationId] = useState<string>("all");
+  const [techId, setTechId] = useState<string>('all');
+  const [clientId, setClientId] = useState<string>('all');
+  const [locationId, setLocationId] = useState<string>('all');
 
-  // Data and UI state
+  // Data state
   const [technicians, setTechnicians] = useState<EmployeeProfile[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
-  const [reportData, setReportData] = useState<ReportRow[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [rows, setRows] = useState<ReportRow[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [reportGenerated, setReportGenerated] = useState(false);
-  const [totalReportDurationSeconds, setTotalReportDurationSeconds] = useState<number>(0);
+  const [totalSeconds, setTotalSeconds] = useState(0);
   const { toast } = useToast();
 
   useEffect(() => {
-    async function fetchFilterData() {
+    // fetch technicians and clients
+    async function fetchFilters() {
       try {
-        const usersRef = collection(db, 'users');
-        const techQ = query(usersRef, where('role', '==', 'technician'), orderBy('displayName', 'asc'));
-        const techSnap = await getDocs(techQ);
-        setTechnicians(techSnap.docs.map(d => ({ uid: d.id, ...d.data() } as EmployeeProfile)));
-      } catch (err) {
-        toast({ title: "Error Fetching Technicians", description: "Could not load technicians.", variant: "destructive" });
+        const userSnap = await getDocs(query(collection(db,'users'), where('role','==','technician'), orderBy('displayName')));
+        setTechnicians(userSnap.docs.map(d=>({ uid:d.id, ...(d.data() as any) } as EmployeeProfile)));
+      } catch {
+        toast({ title:'Error', description:'Loading technicians failed', variant:'destructive' });
       }
       try {
-        const clientsRef = collection(db, 'clients');
-        const clientQ = query(clientsRef, orderBy('name', 'asc'));
-        const clientSnap = await getDocs(clientQ);
-        setClients(clientSnap.docs.map(d => ({ id: d.id, name: (d.data().name as string) } as Client)));
-      } catch (err) {
-        toast({ title: "Error Fetching Clients", description: "Could not load clients.", variant: "destructive" });
+        const clientSnap = await getDocs(query(collection(db,'clients'), orderBy('name')));
+        setClients(clientSnap.docs.map(d=>({ id:d.id, name:d.data().name as string } as Client)));
+      } catch {
+        toast({ title:'Error', description:'Loading clients failed', variant:'destructive' });
       }
     }
-    fetchFilterData();
+    fetchFilters();
   }, [toast]);
 
   useEffect(() => {
-    async function fetchLocations() {
-      if (selectedClientId === 'all') {
-        setLocations([]);
-        setSelectedLocationId('all');
-        return;
-      }
+    if (clientId === 'all') { setLocations([]); setLocationId('all'); return; }
+    async function fetchLocs() {
       try {
-        const locRef = collection(db, 'locations');
-        const locQ = query(locRef, where('clientId', '==', selectedClientId), orderBy('name', 'asc'));
-        const locSnap = await getDocs(locQ);
-        setLocations(locSnap.docs.map(d => ({ id: d.id, name: d.data().name as string, clientId: d.data().clientId as string } as Location)));
+        const locSnap = await getDocs(query(collection(db,'locations'), where('clientId','==',clientId), orderBy('name')));
+        setLocations(locSnap.docs.map(d=>({ id:d.id, name:d.data().name as string, clientId:d.data().clientId as string } as Location)));
       } catch {
-        toast({ title: "Error Fetching Locations", description: "Could not load locations.", variant: "destructive" });
-        setLocations([]);
+        toast({ title:'Error', description:'Loading locations failed', variant:'destructive' });
       }
     }
-    fetchLocations();
-  }, [selectedClientId, toast]);
+    fetchLocs();
+  }, [clientId, toast]);
 
-  const resetReportState = () => {
-    setReportGenerated(false);
-    setReportData([]);
-    setError(null);
-    setTotalReportDurationSeconds(0);
-  };
-
-  const handleGenerateReport = async () => {
-    setIsLoading(true);
-    setError(null);
-    setReportGenerated(true);
-    setReportData([]);
-    setTotalReportDurationSeconds(0);
+  async function handleGenerate() {
+    setLoading(true); setError(null); setRows([]); setTotalSeconds(0);
     try {
-      const startStr = format(startDate, 'yyyy-MM-dd');
-      const endStr = format(endDate, 'yyyy-MM-dd');
-      const timeRef = collection(db, 'timeEntries');
-      const constraints: QueryConstraint[] = [
-        where('entryDate', '>=', startStr),
-        where('entryDate', '<=', endStr),
-      ];
-      if (selectedTechnicianId !== 'all') constraints.push(where('technicianId', '==', selectedTechnicianId));
-      if (selectedClientId !== 'all') {
-        if (selectedLocationId !== 'all') constraints.push(where('locationId', '==', selectedLocationId));
-        else constraints.push(where('clientId', '==', selectedClientId));
+      const startStr = format(startDate,'yyyy-MM-dd');
+      const endStr = format(endDate,'yyyy-MM-dd');
+      const constraints: QueryConstraint[] = [ where('entryDate','>=',startStr), where('entryDate','<=',endStr) ];
+      if (techId!=='all') constraints.push(where('technicianId','==',techId));
+      if (clientId!=='all') {
+        if (locationId!=='all') constraints.push(where('locationId','==',locationId)); else constraints.push(where('clientId','==',clientId));
       }
-      constraints.push(orderBy('entryDate', 'asc'), orderBy('startTime', 'asc'));
-      const q = query(timeRef, ...constraints);
-      const snap = await getDocs(q);
-      const entries = snap.docs.map(d => ({ id: d.id, ...(d.data() as TimeEntry) }));
-      if (entries.length === 0) {
-        toast({ title: "No Data Found", description: "No time entries for criteria." });
-        setIsLoading(false);
-        return;
-      }
-      let totalSec = 0;
-      entries.forEach(e => totalSec += e.workDurationSeconds || 0);
-      setTotalReportDurationSeconds(totalSec);
-      const rows: ReportRow[] = [];
-      for (const e of entries) {
-        let clientName = 'N/A';
-        let locName = 'N/A';
-        let techName = `User: ${e.technicianId}`;
-        try {
-          const userDoc = await getDoc(doc(db, 'users', e.technicianId));
-          if (userDoc.exists()) techName = userDoc.data().displayName || userDoc.data().email || techName;
-        } catch {}
-        try {
-          if (e.clientId) {
-            const cDoc = await getDoc(doc(db, 'clients', e.clientId));
-            if (cDoc.exists()) clientName = cDoc.data().name || clientName;
-          }
-          if (e.locationId) {
-            const lDoc = await getDoc(doc(db, 'locations', e.locationId));
-            if (lDoc.exists()) locName = lDoc.data().name || locName;
-          }
-        } catch {}
-        rows.push({
-          id: e.id,
-          entryDate: e.entryDate,
-          clientName,
-          locationName: locName,
-          technicianNameOrEmail: techName,
-          startTimeFormatted: e.startTime ? format(parseISO(e.startTime), 'HH:mm:ss') : 'N/A',
-          endTimeFormatted: e.endTime ? format(parseISO(e.endTime), 'HH:mm:ss') : 'N/A',
-          workDurationFormatted: typeof e.workDurationSeconds === 'number' ? formatDuration(e.workDurationSeconds) : 'N/A',
-        });
-      }
-      setReportData(rows);
-      toast({ title: "Report Generated", description: `Processed ${rows.length} entries.` });
-    } catch (err: any) {
-      setError(err.message || 'Report generation failed.');
-      toast({ title: "Report Generation Failed", description: error || undefined, variant: 'destructive' });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      constraints.push(orderBy('entryDate','asc'), orderBy('startTime','asc'));
+      const snap = await getDocs(query(collection(db,'timeEntries'), ...constraints));
+      const entries = snap.docs.map(d=>({ ...(d.data() as TimeEntry), id:d.id }));
+      if (entries.length===0) { toast({ title:'No Data', description:'No entries found' }); setLoading(false); return; }
 
-  const handleDownloadCsv = () => {
-    if (!reportGenerated || reportData.length === 0) {
-      toast({ title: "No Data to Download", description: "Generate a report first.", variant: 'destructive' });
-      return;
-    }
-    const headers = ["Date","Client","Location","Technician","Start Time","End Time","Duration"];
-    const rows = reportData.map(r => [
-      r.entryDate,
-      r.clientName,
-      r.locationName,
-      r.technicianNameOrEmail,
-      r.startTimeFormatted,
-      r.endTimeFormatted,
-      r.workDurationFormatted,
-    ]);
-    let csv = 'data:text/csv;charset=utf-8,' + headers.join(',') + '\n';
-    csv += rows.map(r => r.map(c => `"${c.replace(/"/g,'""')}"`).join(',')).join('\n');
-    const uri = encodeURI(csv);
-    const a = document.createElement('a');
-    a.href = uri;
-    a.download = `report_${format(startDate,'yyyyMMdd')}_to_${format(endDate,'yyyyMMdd')}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    toast({ title: "Download Started" });
-  };
+      let sum=0; const report:ReportRow[] = [];
+      for (let e of entries) {
+        sum += e.workDurationSeconds||0;
+        // lookup names
+        let cName='N/A', lName='N/A', tName=`User: ${e.technicianId}`;
+        try { const ud=await getDoc(doc(db,'users',e.technicianId)); if(ud.exists()) tName=ud.data().displayName||ud.data().email||tName; } catch{}
+        try { if(e.clientId){ const cd=await getDoc(doc(db,'clients',e.clientId)); if(cd.exists()) cName=cd.data().name; } } catch{}
+        try { if(e.locationId){ const ld=await getDoc(doc(db,'locations',e.locationId)); if(ld.exists()) lName=ld.data().name; } } catch{}
+        report.push({ id:e.id, entryDate:e.entryDate, clientName:cName, locationName:lName, technicianName:tName, startTimeFormatted:e.startTime?format(parseISO(e.startTime),'HH:mm'): 'N/A', endTimeFormatted:e.endTime?format(parseISO(e.endTime),'HH:mm'):'N/A', durationFormatted: formatDuration(e.workDurationSeconds||0) });
+      }
+      setRows(report); setTotalSeconds(sum);
+      toast({ title:'Report Generated', description:`${report.length} records` });
+    } catch (err:any) {
+      setError(err.message||'Failed'); toast({ title:'Error', description:'Report generation failed', variant:'destructive' });
+    } finally { setLoading(false); }
+  }
+
+  function handleDownload() {
+    if (!rows.length) { toast({ title:'No Data', description:'Generate first', variant:'destructive' }); return; }
+    const headers=['Date','Client','Location','Tech','Start','End','Duration'];
+    const csv=[headers.join(',')]; rows.forEach(r=>{ csv.push([r.entryDate,r.clientName,r.locationName,r.technicianName,r.startTimeFormatted,r.endTimeFormatted,r.durationFormatted].map(v=>`"${v}"`).join(',')); });
+    const uri='data:text/csv;charset=utf-8,'+encodeURI(csv.join('\n'));
+    const a=document.createElement('a'); a.href=uri; a.download=`report_${format(startDate,'yyyyMMdd')}_to_${format(endDate,'yyyyMMdd')}.csv`; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    toast({ title:'Download Started' });
+  }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-          <BarChart3 className="h-8 w-8 text-primary" /> Reporting
-        </h1>
-      </div>
-      <Card className="shadow-md mb-6">
+    <div className="container mx-auto p-4">
+      <Card className="mb-4">
         <CardHeader>
-          <CardTitle>Generate Time Entry Report</n          </CardTitle>
-          <CardDescription>Select criteria to view time entries.</CardDescription>
+          <CardTitle>Generate Time Entry Report</CardTitle>
+          <CardDescription>Select dates and filters</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Start Date */}
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Start Date</label>
-              <Popover open={isStartPickerOpen} onOpenChange={setIsStartPickerOpen}>
+              <label className="block text-sm text-muted-foreground mb-1">Start Date</label>
+              <Popover open={startOpen} onOpenChange={setStartOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" onClick={() => setIsStartPickerOpen(true)} className="w-full justify-start text-left">
-                    <CalendarIcon className="mr-2 h-4 w-4" />{format(startDate,'LLL dd, y')}
+                  <Button variant="outline" className="w-full justify-start" onClick={()=>setStartOpen(true)}>
+                    <CalendarIcon className="mr-2 w-4 h-4" />{format(startDate,'LLL dd, yyyy')}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={startDate} onSelect={(d) => { setStartDate(d); setEndDate(d); setIsStartPickerOpen(false); resetReportState(); }} />
+                <PopoverContent className="p-0" align="start">
+                  <Calendar mode="single" selected={startDate} onSelect={d=>{ if(d){ setStartDate(d); setEndDate(d); resetReportState(); setStartOpen(false);} }} />
                 </PopoverContent>
               </Popover>
             </div>
             {/* End Date */}
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">End Date</label>
-              <Popover open={isEndPickerOpen} onOpenChange={setIsEndPickerOpen}>
+              <label className="block text-sm text-muted-foreground mb-1">End Date</label>
+              <Popover open={endOpen} onOpenChange={setEndOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" onClick={() => setIsEndPickerOpen(true)} className="w-full justify-start text-left">
-                    <CalendarIcon className="mr-2 h-4 w-4" />{format(endDate,'LLL dd, y')}
+                  <Button variant="outline" className="w-full justify-start" onClick={()=>setEndOpen(true)}>
+                    <CalendarIcon className="mr-2 w-4 h-4" />{format(endDate,'LLL dd, yyyy')}
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar mode="single" selected={endDate} onSelect={(d) => { setEndDate(d); setIsEndPickerOpen(false); resetReportState(); }} />
+                <PopoverContent className="p-0" align="start">
+                  <Calendar mode="single" selected={endDate} onSelect={d=>{ if(d){ setEndDate(d); resetReportState(); setEndOpen(false);} }} />
                 </PopoverContent>
               </Popover>
             </div>
             {/* Client */}
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Client</label>
-              <Select value={selectedClientId} onValueChange={(v) => { setSelectedClientId(v); setSelectedLocationId('all'); resetReportState(); }}>
-                <SelectTrigger className="w-full"><Briefcase className="mr-2 h-4 w-4"/><SelectValue placeholder="All Clients"/></SelectTrigger>
+              <label className="block text-sm text-muted-foreground mb-1">Client</label>
+              <Select value={clientId} onValueChange={v=>{ setClientId(v); resetReportState(); }}>
+                <SelectTrigger className="w-full"><Briefcase className="mr-2 w-4 h-4"/><SelectValue placeholder="All Clients"/></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Clients</SelectItem>
-                  {clients.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                  {clients.map(c=><SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             {/* Location */}
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Location</label>
-              <Select value={selectedLocationId} onValueChange={(v) => { setSelectedLocationId(v); resetReportState(); }} disabled={selectedClientId==='all'}>
-                <SelectTrigger className="w-full"><MapPin className="mr-2 h-4 w-4"/><SelectValue placeholder="All Locations"/></SelectTrigger>
+              <label className="block text-sm text-muted-foreground mb-1">Location</label>
+              <Select value={locationId} onValueChange={v=>{ setLocationId(v); resetReportState(); }} disabled={clientId==='all'}>
+                <SelectTrigger className="w-full"><MapPin className="mr-2 w-4 h-4"/><SelectValue placeholder="All Locations"/></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Locations</SelectItem>
-                  {locations.map(l => <SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}
+                  {locations.map(l=><SelectItem key={l.id} value={l.id}>{l.name}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
             {/* Technician */}
             <div>
-              <label className="block text-sm font-medium text-muted-foreground mb-1">Technician</label>
-              <Select value={selectedTechnicianId} onValueChange={(v) => { setSelectedTechnicianId(v); resetReportState(); }}>
-                <SelectTrigger className="w-full"><Users className="mr-2 h-4 w-4"/><SelectValue placeholder="All Technicians"/></SelectTrigger>
+              <label className="block text-sm text-muted-foreground mb-1">Technician</n              </label>
+              <Select value={techId} onValueChange={v=>{ setTechId(v); resetReportState(); }}>
+                <SelectTrigger className="w-full"><Users className="mr-2 w-4 h-4"/><SelectValue placeholder="All Technicians"/></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Technicians</SelectItem>
-                  {technicians.map(t => <SelectItem key={t.uid} value={t.uid}>{t.displayName || t.email}</SelectItem>)}
+                  {technicians.map(t=><SelectItem key={t.uid} value={t.uid}>{t.displayName||t.email}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
-            <Button onClick={handleGenerateReport} disabled={isLoading} className="w-full sm:w-auto col-span-4">
-              {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : <Search className="mr-2 h-4 w-4"/>} Generate Report
+            <Button onClick={handleGenerate} disabled={loading} className="col-span-full sm:col-auto">
+              {loading ? <Loader2 className="mr-2 w-4 h-4 animate-spin"/> : <Search className="mr-2 w-4 h-4"/>} Generate
             </Button>
           </div>
         </CardContent>
       </Card>
-      {/* Render Report Results...
-         (Unchanged except using startDate and endDate for heading) */}
+      {/* Results */}
+      {error && <Card className="mb-4"><CardContent><AlertTriangle className="mr-2 inline"/> {error}</CardContent></Card>}
+      {rows.length>0 && <Card>
+        <CardHeader>
+          <CardTitle>Report Results</CardTitle>
+          <CardDescription>From {format(startDate,'LLL d, yyyy')} to {format(endDate,'LLL d, yyyy')} ({rows.length} entries, total {formatDuration(totalSeconds)})</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-auto">
+            <Table>
+              <TableHeader><TableRow><TableHead>Date</TableHead><TableHead>Client</TableHead><TableHead>Location</TableHead><TableHead>Tech</TableHead><TableHead>Start</TableHead><TableHead>End</TableHead><TableHead className="text-right">Duration</TableHead></TableRow></TableHeader>
+              <TableBody>
+                {rows.map(r=><TableRow key={r.id}><TableCell>{format(new Date(r.entryDate),'LLL d, yyyy')}</TableCell><TableCell>{r.clientName}</TableCell><TableCell>{r.locationName}</TableCell><TableCell>{r.technicianName}</TableCell><TableCell>{r.startTimeFormatted}</TableCell><TableCell>{r.endTimeFormatted}</TableCell><TableCell className="text-right">{r.durationFormatted}</TableCell></TableRow>)}
+              </TableBody>
+            </Table>
+          </div>
+          <Button onClick={handleDownload} variant="outline" className="mt-4"><Download className="mr-2 w-4 h-4"/>Download CSV</Button>
+        </CardContent>
+      </Card>}
     </div>
-);
+  );
+}
