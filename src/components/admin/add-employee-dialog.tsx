@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -14,119 +13,78 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { useForm, type SubmitHandler, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { db, auth } from '@/lib/firebase'; 
 import { doc, setDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword } from 'firebase/auth'; 
-import { Loader2, Info } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { db, auth } from '@/lib/firebase';
+// Replace direct Auth sign-up with serverless function
 
 const employeeProfileSchema = z.object({
-  displayName: z.string().min(1, { message: "Display name is required." }).max(100),
-  email: z.string().email({ message: "Invalid email address." }),
-  password: z.string().min(6, { message: "Password must be at least 6 characters." }),
-  confirmPassword: z.string().min(6, { message: "Please confirm the password." }),
-  role: z.enum(["technician", "admin"], { required_error: "Role is required." }),
+  displayName: z.string().min(1).max(100),
+  email: z.string().email(),
+  password: z.string().min(6),
+  confirmPassword: z.string().min(6),
+  role: z.enum(['technician', 'admin']),
 }).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"], 
+  message: "Passwords must match",
+  path: ['confirmPassword'],
 });
 
-type EmployeeProfileFormValues = z.infer<typeof employeeProfileSchema>;
+type FormValues = z.infer<typeof employeeProfileSchema>;
 
-interface AddEmployeeDialogProps {
+interface Props {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onEmployeeAdded: () => void;
 }
 
-export function AddEmployeeDialog({ isOpen, onOpenChange, onEmployeeAdded }: AddEmployeeDialogProps) {
+export function AddEmployeeDialog({ isOpen, onOpenChange, onEmployeeAdded }: Props) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const {
-    control,
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-    setError,
-  } = useForm<EmployeeProfileFormValues>({
-    resolver: zodResolver(employeeProfileSchema),
-    defaultValues: {
-      displayName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      role: undefined,
-    },
+  const { control, register, handleSubmit, reset, formState: { errors }, setError } = useForm<FormValues>({
+    resolver: zodResolver(employeeProfileSchema)
   });
 
-  const onSubmit: SubmitHandler<EmployeeProfileFormValues> = async (data) => {
+  const onSubmit: SubmitHandler<FormValues> = async (data) => {
     setIsSubmitting(true);
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
-      const newUser = userCredential.user;
-
-      const userDocRef = doc(db, 'users', newUser.uid);
-      await setDoc(userDocRef, {
-        displayName: data.displayName,
-        email: data.email, 
-        role: data.role,
-        status: "active", // Set initial status to active
+      const res = await fetch('/api/adminCreateUser', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: data.email,
+          password: data.password,
+          displayName: data.displayName,
+          role: data.role,
+        }),
       });
-
-      toast({
-        title: "Employee Added Successfully",
-        description: `User ${data.displayName} (${data.email}) created and profile saved.`,
-      });
+      const result = await res.json();
+      if (!res.ok) {
+        if (result.code === 'auth/email-already-in-use') {
+          setError('email', { type: 'manual', message: 'Email already in use.' });
+        } else {
+          toast({ title: 'Error', description: result.message || 'Failed to create user.', variant: 'destructive' });
+        }
+        setIsSubmitting(false);
+        return;
+      }
+      toast({ title: 'Success', description: `Employee created (UID: ${result.uid})` });
       onEmployeeAdded();
       reset();
       onOpenChange(false);
-    } catch (error) {
-      const authError = error as AuthError;
-      let friendlyMessage = "Could not add employee. Please try again.";
-      // Handle known Firebase Auth errors
-      if (authError.code) {
-        if (authError.code === 'auth/email-already-in-use') {
-          friendlyMessage = 'This email address is already in use. Please use a different email.';
-          setError("email", { type: "manual", message: friendlyMessage });
-          setIsSubmitting(false);
-          return; // Stop further execution
-        }
-        if (authError.code === 'auth/weak-password') {
-          friendlyMessage = 'The password is too weak. It must be at least 6 characters long.';
-          setError("password", { type: "manual", message: friendlyMessage });
-          setIsSubmitting(false);
-          return;
-        }
-        if (authError.code === 'auth/invalid-email') {
-          friendlyMessage = 'The email address is not valid.';
-          setError("email", { type: "manual", message: friendlyMessage });
-          setIsSubmitting(false);
-          return;
-        }
-        // Fallback for other errors
-        friendlyMessage = `An error occurred: ${authError.message}`;
-      }
-      console.error("Error adding employee:", authError);
-      toast({
-        title: "Error Adding Employee",
-        description: friendlyMessage,
-        variant: "destructive",
-      });
+    } catch (err: any) {
+      console.error('Add employee error:', err);
+      toast({ title: 'Error', description: err.message || 'Network error', variant: 'destructive' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   React.useEffect(() => {
-    if (!isOpen) {
-      reset();
-    }
+    if (!isOpen) reset();
   }, [isOpen, reset]);
 
   return (
@@ -134,72 +92,37 @@ export function AddEmployeeDialog({ isOpen, onOpenChange, onEmployeeAdded }: Add
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Add New Employee</DialogTitle>
-          <DialogDescription>
-            Fill in the details for the new employee. This will create their login credentials and application profile with an 'active' status.
-          </DialogDescription>
+          <DialogDescription>Provide employee credentials and role.</DialogDescription>
         </DialogHeader>
-
-        <Alert variant="default" className="mt-4 bg-primary/5 border-primary/30">
-          <Info className="h-4 w-4 text-primary" />
-          <AlertTitle className="text-primary font-semibold">Employee Creation Process</AlertTitle>
-          <AlertDescription className="text-xs">
-            This form will create the employee's login account in Firebase Authentication and their profile in the application database.
-            The employee can change their password later if needed.
-          </AlertDescription>
-        </Alert>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <Label htmlFor="displayName_add_employee_dialog" className="mb-1 block">Display Name</Label>
-            <Input
-              id="displayName_add_employee_dialog"
-              {...register("displayName")}
-              placeholder="e.g., Jane Doe"
-              className={errors.displayName ? "border-destructive" : ""}
-            />
-            {errors.displayName && <p className="text-sm text-destructive mt-1">{errors.displayName.message}</p>}
+            <Label>Display Name</Label>
+            <Input {...register('displayName')} />
+            {errors.displayName && <p className="text-sm text-destructive">{errors.displayName.message}</p>}
           </div>
           <div>
-            <Label htmlFor="email_add_employee_dialog" className="mb-1 block">Email Address (Login)</Label>
-            <Input
-              id="email_add_employee_dialog"
-              type="email"
-              {...register("email")}
-              placeholder="e.g., user@example.com"
-              className={errors.email ? "border-destructive" : ""}
-            />
-            {errors.email && <p className="text-sm text-destructive mt-1">{errors.email.message}</p>}
+            <Label>Email</Label>
+            <Input type="email" {...register('email')} />
+            {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
           </div>
           <div>
-            <Label htmlFor="password_add_employee_dialog_new" className="mb-1 block">Password</Label>
-            <Input
-              id="password_add_employee_dialog_new"
-              type="password"
-              {...register("password")}
-              placeholder="Min. 6 characters"
-              className={errors.password ? "border-destructive" : ""}
-            />
-            {errors.password && <p className="text-sm text-destructive mt-1">{errors.password.message}</p>}
-          </div>
-           <div>
-            <Label htmlFor="confirmPassword_add_employee_dialog_new" className="mb-1 block">Confirm Password</Label>
-            <Input
-              id="confirmPassword_add_employee_dialog_new"
-              type="password"
-              {...register("confirmPassword")}
-              placeholder="Re-enter password"
-              className={errors.confirmPassword ? "border-destructive" : ""}
-            />
-            {errors.confirmPassword && <p className="text-sm text-destructive mt-1">{errors.confirmPassword.message}</p>}
+            <Label>Password</Label>
+            <Input type="password" {...register('password')} />
+            {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
           </div>
           <div>
-            <Label htmlFor="role_add_employee_dialog" className="mb-1 block">Role</Label>
+            <Label>Confirm Password</Label>
+            <Input type="password" {...register('confirmPassword')} />
+            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
+          </div>
+          <div>
+            <Label>Role</Label>
             <Controller
               name="role"
               control={control}
               render={({ field }) => (
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <SelectTrigger id="role_add_employee_dialog" className={errors.role ? "border-destructive" : ""}>
+                <Select onValueChange={field.onChange}>
+                  <SelectTrigger>
                     <SelectValue placeholder="Select role" />
                   </SelectTrigger>
                   <SelectContent>
@@ -209,23 +132,16 @@ export function AddEmployeeDialog({ isOpen, onOpenChange, onEmployeeAdded }: Add
                 </Select>
               )}
             />
-            {errors.role && <p className="text-sm text-destructive mt-1">{errors.role.message}</p>}
+            {errors.role && <p className="text-sm text-destructive">{errors.role.message}</p>}
           </div>
-          <DialogFooter className="pt-2">
+          <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline" disabled={isSubmitting}>
-                Cancel
-              </Button>
+              <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-              {isSubmitting ? "Adding Employee..." : "Add Employee"}
-            </Button>
+            <Button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Adding...' : 'Add Employee'}</Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
 }
-
-    
