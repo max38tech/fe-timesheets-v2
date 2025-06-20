@@ -10,8 +10,21 @@ import { collection, getDocs, query, orderBy, doc, getDoc, where, limit, type Ti
 import { useToast } from '@/hooks/use-toast';
 import { format, parseISO, startOfDay, endOfDay, isValid } from 'date-fns';
 import { formatDuration } from '@/lib/utils';
-import type { JobSubmission } from '@/app/admin/approvals/page';
 import { SubmissionDetailsDialog } from '@/components/admin/submission-details-dialog';
+
+// Define JobSubmission interface to match the one expected by SubmissionDetailsDialog
+interface JobSubmission {
+  id: string;
+  clientId: string;
+  clientName: string;
+  locationId: string;
+  locationName: string;
+  technicianId: string;
+  technicianEmail?: string;
+  taskNotes?: string;
+  status?: string;
+  submittedAt?: Date;
+}
 import { Button } from "@/components/ui/button";
 import { EditTimeEntryDialog } from '@/components/admin/edit-time-entry-dialog';
 import { ConfirmDeleteDialog } from '@/components/ui/confirm-delete-dialog';
@@ -175,19 +188,29 @@ export default function TimeEntriesPage() {
           clientName: submissionData.clientName || entry.clientName,
           locationName: submissionData.locationName || entry.locationName,
           technicianEmail: submissionData.technicianEmail || (entry.technicianNameOrEmail.includes('@') ? entry.technicianNameOrEmail : 'N/A'),
-          taskNotes: submissionData.taskNotes || 'No task notes found for this day.',
+          taskNotes: submissionData.taskNotes,
           status: submissionData.status || 'unknown',
-          submittedAt: submittedAtTimestamp ? submittedAtTimestamp.toDate() : null,
+          submittedAt: submittedAtTimestamp ? submittedAtTimestamp.toDate() : undefined,
           clientId: submissionData.clientId || entry.clientId,
           locationId: submissionData.locationId || entry.locationId,
           technicianId: submissionData.technicianId || entry.technicianId,
         });
         setIsDetailsDialogOpen(true);
       } else {
-        toast({
-          title: "No Matching Task Submission Found",
-          description: "No task notes submission was found for this specific time entry's details (technician, client, location, and date).",
+        // Create a submission object even if no submission was found
+        setSelectedJobSubmission({
+          id: 'generated-' + entry.id, // Generate a temporary ID
+          clientName: entry.clientName,
+          locationName: entry.locationName,
+          technicianEmail: entry.technicianNameOrEmail.includes('@') ? entry.technicianNameOrEmail : 'N/A',
+          taskNotes: '',
+          status: 'unknown',
+          submittedAt: undefined,
+          clientId: entry.clientId,
+          locationId: entry.locationId,
+          technicianId: entry.technicianId,
         });
+        setIsDetailsDialogOpen(true);
       }
     } catch (err) {
       console.error("Error fetching job submission for details:", err);

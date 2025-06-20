@@ -13,18 +13,18 @@ import { Badge } from '@/components/ui/badge';
 import { SubmissionDetailsDialog } from '@/components/admin/submission-details-dialog';
 import { useToast } from '@/hooks/use-toast';
 
+// Match the JobSubmission interface from SubmissionDetailsDialog
 export interface JobSubmission {
   id: string;
+  clientId: string;
   clientName: string;
+  locationId: string;
   locationName: string;
-  technicianEmail: string;
-  taskNotes: string;
-  status: string;
-  submittedAt: Date | null;
-  // Optional fields if they exist in your Firestore document
-  clientId?: string;
-  locationId?: string;
-  technicianId?: string;
+  technicianId: string;
+  technicianEmail?: string;
+  taskNotes?: string;
+  status?: string;
+  submittedAt?: Date;
 }
 
 export default function ApprovalsPage() {
@@ -53,12 +53,12 @@ export default function ApprovalsPage() {
             clientName: data.clientName || 'N/A',
             locationName: data.locationName || 'N/A',
             technicianEmail: data.technicianEmail || 'N/A',
-            taskNotes: data.taskNotes || '',
+            taskNotes: data.taskNotes,
             status: data.status || 'unknown',
-            submittedAt: submittedAtTimestamp ? submittedAtTimestamp.toDate() : null,
-            clientId: data.clientId,
-            locationId: data.locationId,
-            technicianId: data.technicianId,
+            submittedAt: submittedAtTimestamp ? submittedAtTimestamp.toDate() : undefined,
+            clientId: data.clientId || 'unknown',
+            locationId: data.locationId || 'unknown',
+            technicianId: data.technicianId || 'unknown',
           };
         });
         setSubmissions(fetchedSubmissions);
@@ -73,8 +73,8 @@ export default function ApprovalsPage() {
     fetchSubmissions();
   }, []);
 
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status.toLowerCase()) {
+  const getStatusBadgeVariant = (status?: string) => {
+    switch (status?.toLowerCase()) {
       case 'pending_approval':
         return 'secondary';
       case 'approved':
@@ -183,7 +183,7 @@ export default function ApprovalsPage() {
                     </TableCell>
                     <TableCell>
                       <Badge variant={getStatusBadgeVariant(submission.status)}>
-                        {submission.status.replace(/_/g, ' ').toUpperCase()}
+                        {(submission.status || 'UNKNOWN').replace(/_/g, ' ').toUpperCase()}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">

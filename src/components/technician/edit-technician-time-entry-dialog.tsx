@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useForm, type SubmitHandler, Controller } from "react-hook-form";
@@ -45,10 +46,8 @@ const timeEntryEditSchema = z.object({
   entryDate: z.date({ required_error: "Entry date is required." }),
   startTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: "Invalid start time format (HH:mm)." }),
   endTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: "Invalid end time format (HH:mm)." }),
-  breakDurationMinutes: z.preprocess(
-    (val) => (typeof val === 'string' ? parseInt(val, 10) : typeof val === 'number' ? val : 0),
-    z.number().min(0, { message: "Break duration cannot be negative." })
-  ),
+  breakDurationMinutes: z.number().min(0, { message: "Break duration cannot be negative." }),
+  taskNotes: z.string().optional(),
 });
 
 type TimeEntryEditFormValues = z.infer<typeof timeEntryEditSchema>;
@@ -85,6 +84,7 @@ export function EditTechnicianTimeEntryDialog({
       startTime: "09:00",
       endTime: "17:00",
       breakDurationMinutes: 0,
+      taskNotes: "",
     }
   });
 
@@ -169,6 +169,7 @@ export function EditTechnicianTimeEntryDialog({
         endTime: formatISO(endDateTime),
         totalBreakDurationSeconds: breakInSeconds,
         workDurationSeconds: workDurationSeconds,
+        taskNotes: data.taskNotes || null // Save task notes, use null if undefined
       });
 
       toast({
@@ -321,6 +322,19 @@ export function EditTechnicianTimeEntryDialog({
                 className={cn("mt-1", errors.breakDurationMinutes && "border-destructive")}
               />
               {errors.breakDurationMinutes && <p className="text-sm text-destructive mt-1">{errors.breakDurationMinutes.message}</p>}
+            </div>
+
+            <div>
+              <Label htmlFor="techEditTaskNotes">Task Notes</Label>
+              <Textarea
+                id="techEditTaskNotes"
+                {...register("taskNotes")}
+                placeholder="Enter task notes..."
+                disabled={isSubmitting}
+                className={cn("mt-1", errors.taskNotes && "border-destructive")}
+                rows={3}
+              />
+              {errors.taskNotes && <p className="text-sm text-destructive mt-1">{errors.taskNotes.message}</p>}
             </div>
 
             <div className="text-sm text-muted-foreground">

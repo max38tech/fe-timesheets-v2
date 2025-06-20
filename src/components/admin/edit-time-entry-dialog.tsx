@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useForm, type SubmitHandler, Controller } from "react-hook-form";
@@ -25,7 +26,25 @@ import { doc, updateDoc, collection, getDocs, query, where, orderBy } from 'fire
 import { Loader2, CalendarIcon } from 'lucide-react';
 import { format, parseISO, setHours, setMinutes, setSeconds, differenceInSeconds, formatISO, isValid } from 'date-fns';
 import { cn, formatDuration } from '@/lib/utils';
-import type { EnrichedTimeEntry } from '@/app/admin/time-entries/page';
+// Define EnrichedTimeEntry interface locally since we can't import it
+interface EnrichedTimeEntry {
+  id: string;
+  entryDate: string;
+  startTime: string;
+  endTime: string;
+  workDurationSeconds: number;
+  totalBreakDurationSeconds: number;
+  clientId: string;
+  locationId: string;
+  technicianId: string;
+  clientName: string;
+  locationName: string;
+  technicianNameOrEmail: string;
+  startTimeFormatted: string;
+  endTimeFormatted: string;
+  workDurationFormatted: string;
+  breakDurationFormatted: string;
+}
 import { ClientSelector } from '@/components/technician/client-selector'; // For selecting clients
 import { LocationSelector } from '@/components/technician/location-selector'; // For selecting locations
 
@@ -33,12 +52,10 @@ const timeEntrySchema = z.object({
   entryDate: z.date({ required_error: "Entry date is required." }),
   startTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: "Invalid start time format (HH:mm)." }),
   endTime: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, { message: "Invalid end time format (HH:mm)." }),
-  breakDurationMinutes: z.preprocess(
-    (val) => (typeof val === 'string' ? parseInt(val, 10) : typeof val === 'number' ? val : 0),
-    z.number().min(0, { message: "Break duration cannot be negative." })
-  ),
+  breakDurationMinutes: z.number().min(0, { message: "Break duration cannot be negative." }),
   clientId: z.string().min(1, { message: "Client is required."}),
   locationId: z.string().min(1, { message: "Location is required."}),
+  taskNotes: z.string().optional(),
 });
 
 type TimeEntryFormValues = z.infer<typeof timeEntrySchema>;
@@ -90,6 +107,7 @@ export function EditTimeEntryDialog({
       breakDurationMinutes: 0,
       clientId: "",
       locationId: "",
+      taskNotes: "",
     }
   });
 
@@ -184,8 +202,9 @@ export function EditTimeEntryDialog({
         endTime: formatISO(endDateTime),
         totalBreakDurationSeconds: breakInSeconds,
         workDurationSeconds: workDurationSeconds,
-        clientId: data.clientId, // Save updated client ID
-        locationId: data.locationId, // Save updated location ID
+        clientId: data.clientId,
+        locationId: data.locationId,
+        taskNotes: data.taskNotes || null // Save task notes, use null if undefined
       });
 
       toast({
@@ -362,6 +381,19 @@ export function EditTimeEntryDialog({
                 className={cn("mt-1", errors.breakDurationMinutes && "border-destructive")}
               />
               {errors.breakDurationMinutes && <p className="text-sm text-destructive mt-1">{errors.breakDurationMinutes.message}</p>}
+            </div>
+
+            <div>
+              <Label htmlFor="editTaskNotes">Task Notes</Label>
+              <Textarea
+                id="editTaskNotes"
+                {...register("taskNotes")}
+                placeholder="Enter task notes..."
+                disabled={isSubmitting}
+                className={cn("mt-1", errors.taskNotes && "border-destructive")}
+                rows={3}
+              />
+              {errors.taskNotes && <p className="text-sm text-destructive mt-1">{errors.taskNotes.message}</p>}
             </div>
 
             <div className="text-sm text-muted-foreground">
