@@ -40,6 +40,7 @@ export interface TimeEntry { // Exporting for use in the dialog
   endTime: string; // ISO string
   totalBreakDurationSeconds: number;
   workDurationSeconds: number;
+  taskNotes?: string;
   // For dialog context, we'll add these if available when selecting an entry
   clientId?: string;
   locationId?: string;
@@ -122,20 +123,27 @@ export function TodaysTimeEntries({ technicianId, selectedClient, selectedLocati
       );
 
       const querySnapshot = await getDocs(entriesQuery);
-      const fetchedEntries = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        startTime: doc.data().startTime as string,
-        endTime: doc.data().endTime as string,
-        totalBreakDurationSeconds: doc.data().totalBreakDurationSeconds as number || 0,
-        workDurationSeconds: doc.data().workDurationSeconds as number || 0,
-        // Add client/location/tech info for the edit dialog context
-        clientId: selectedClient.id,
-        locationId: selectedLocation.id,
-        clientName: selectedClient.name,
-        locationName: selectedLocation.name,
-        technicianId: technicianId,
-        entryDate: formattedDate, // Pass the original entry date string
-      }));
+      console.log('Raw query snapshot:', querySnapshot.docs.map(d => ({ id: d.id, data: d.data() })));
+      
+      const fetchedEntries = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        console.log('Processing entry:', { id: doc.id, data });
+        return {
+          id: doc.id,
+          startTime: data.startTime as string,
+          endTime: data.endTime as string,
+          totalBreakDurationSeconds: data.totalBreakDurationSeconds as number || 0,
+          workDurationSeconds: data.workDurationSeconds as number || 0,
+          taskNotes: data.taskNotes as string | undefined,
+          // Add client/location/tech info for the edit dialog context
+          clientId: selectedClient.id,
+          locationId: selectedLocation.id,
+          clientName: selectedClient.name,
+          locationName: selectedLocation.name,
+          technicianId: technicianId,
+          entryDate: formattedDate, // Pass the original entry date string
+        };
+      });
       setTimeEntries(fetchedEntries);
       if (fetchedEntries.length === 0 && !isLoadingStatus) { // Only toast if status check is also done or not critical
          toast({ title: "No Entries", description: `No time entries found for ${selectedClient.name} at ${selectedLocation.name} on ${format(displayDate, 'MMM d, yyyy')}.`})

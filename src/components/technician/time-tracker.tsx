@@ -28,10 +28,12 @@ export function TimeTracker({ isJobSelected, technicianId, clientId, locationId 
   const [startTimeValue, setStartTimeValue] = useState<string>(''); // HH:mm format
   const [endTimeValue, setEndTimeValue] = useState<string>('');   // HH:mm format
   const [breakDurationMinutes, setBreakDurationMinutes] = useState<string>('0');
+  const [taskNotes, setTaskNotes] = useState<string>('');
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
   const resetForm = () => {
+    setTaskNotes('');
     setEntryDate(new Date());
     setStartTimeValue('');
     setEndTimeValue('');
@@ -115,6 +117,8 @@ export function TimeTracker({ isJobSelected, technicianId, clientId, locationId 
         workDurationSeconds,
         entryDate: format(entryDate, 'yyyy-MM-dd'), 
         createdAt: serverTimestamp(),
+        taskNotes: taskNotes || null,
+        status: 'draft' // New entries start as draft
       });
 
       toast({ title: "Time Entry Saved", description: `Work duration: ${formatDuration(workDurationSeconds)}. Entry saved successfully.` });
@@ -210,6 +214,18 @@ export function TimeTracker({ isJobSelected, technicianId, clientId, locationId 
             min="0"
             disabled={!isJobSelected || isSaving || !entryDate}
             className="mt-1"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor="taskNotes">Task Notes</Label>
+          <textarea
+            id="taskNotes"
+            value={taskNotes}
+            onChange={(e) => setTaskNotes(e.target.value)}
+            placeholder="Enter task notes (optional)"
+            disabled={!isJobSelected || isSaving || !entryDate}
+            className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 mt-1"
           />
         </div>
 

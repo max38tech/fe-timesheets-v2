@@ -1,4 +1,3 @@
-
 rules_version = '2';
 
 service cloud.firestore {
@@ -25,98 +24,69 @@ service cloud.firestore {
     }
 
     // Users Collection
-    // User profiles, roles, status
     match /users/{userId} {
-      // Admins can read any user profile
-      // Users can read their own profile
       allow read: if isAuthenticated() && (isAdmin() || isOwner(userId));
-
-      // Admins can create user profiles (e.g., when adding an employee)
-      allow create: if isAuthenticated() && isAdmin();
-
-      // Admins can update any user profile (displayName, role, status)
-      // Users can update their own displayName
+      allow create: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
       allow update: if isAuthenticated() && (
                     isAdmin() ||
                     (isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName']))
                   );
-      // Admins can delete user profiles (though archiving is preferred via 'status' field)
-      // Deleting user documents directly here might orphan Firebase Auth accounts.
       allow delete: if isAuthenticated() && isAdmin();
     }
 
     // Clients Collection
-    // Client company information
     match /clients/{clientId} {
-      // Authenticated users (Admins and Technicians) can read client lists
       allow read: if isAuthenticated();
-      // Only Admins can create, update, or delete clients
-      allow write: if isAuthenticated() && isAdmin(); // covers create, update, delete
+      allow write: if isAuthenticated() && isAdmin();
     }
 
     // Locations Collection
-    // Job site locations, linked to a client
     match /locations/{locationId} {
-      // Authenticated users (Admins and Technicians) can read location lists
       allow read: if isAuthenticated();
-      // Only Admins can create, update, or delete locations
       allow write: if isAuthenticated() && isAdmin();
     }
 
     // TimeEntries Collection
-    // Individual clock-in/out records
     match /timeEntries/{entryId} {
-      // Technicians can create their own time entries.
-      // Admins can also create entries (e.g., manual corrections, though UI doesn't support this directly for admins yet)
       allow create: if isAuthenticated() &&
                       (
                         (isTechnician() && request.resource.data.technicianId == request.auth.uid) ||
                         isAdmin()
                       );
 
-      // Technicians can read their own time entries.
-      // Admins can read all time entries.
       allow read: if isAuthenticated() &&
                     (
                       (isTechnician() && resource.data.technicianId == request.auth.uid) ||
                       isAdmin()
                     );
 
-      // Admins can update any time entry.
-      // Technicians cannot update their entries once created through the current UI flow.
-      allow update: if isAuthenticated() && isAdmin();
+      // Allow technicians to update their own entries, and admins to update any entry
+      allow update: if isAuthenticated() && (
+        isAdmin() || 
+        (isTechnician() && resource.data.technicianId == request.auth.uid)
+      );
 
-      // Admins can delete any time entry.
       allow delete: if isAuthenticated() && isAdmin();
     }
 
     // JobSubmissions Collection
-    // Task notes and approval status for a job
     match /jobSubmissions/{submissionId} {
-      // Technicians can create their own job submissions.
       allow create: if isAuthenticated() &&
                       isTechnician() &&
                       request.resource.data.technicianId == request.auth.uid &&
-                      request.resource.data.status == 'pending_approval'; // Ensure initial status is correct
+                      request.resource.data.status == 'pending_approval';
 
-      // Technicians can read their own submissions.
-      // Admins can read all submissions.
       allow read: if isAuthenticated() &&
                     (
                       (isTechnician() && resource.data.technicianId == request.auth.uid) ||
                       isAdmin()
                     );
 
-      // Admins can update job submissions (primarily for status changes 'approved'/'rejected').
-      // Technicians cannot update their submissions once made.
       allow update: if isAuthenticated() &&
                       isAdmin() &&
-                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']); // Only allow status updates by admin typically
+                      request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status']);
 
-      // Admins can delete submissions (though less common than status changes).
       allow delete: if isAuthenticated() && isAdmin();
     }
   }
 }
-
-    

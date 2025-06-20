@@ -36,6 +36,8 @@ interface TimeEntryForDialog {
   endTime: string; // HH:mm format
   totalBreakDurationSeconds: number;
   workDurationSeconds: number;
+  taskNotes?: string;
+  status?: 'draft' | 'pending_approval' | 'approved' | 'rejected';
   // Contextual, non-editable:
   clientName: string;
   locationName: string;
@@ -105,10 +107,21 @@ export function EditTechnicianTimeEntryDialog({
         parsedEntryDate = parseISO(initialTimeEntry.startTime);
       }
       
+      console.log('Initial time entry:', initialTimeEntry); // Add logging to debug
+      
       setValue("entryDate", parsedEntryDate);
       setValue("startTime", initialTimeEntry.startTime ? format(parseISO(initialTimeEntry.startTime), 'HH:mm') : "00:00");
       setValue("endTime", initialTimeEntry.endTime ? format(parseISO(initialTimeEntry.endTime), 'HH:mm') : "00:00");
       setValue("breakDurationMinutes", Math.round(initialTimeEntry.totalBreakDurationSeconds / 60));
+      
+      // Explicitly check for taskNotes
+      if ('taskNotes' in initialTimeEntry) {
+        console.log('Setting task notes:', initialTimeEntry.taskNotes);
+        setValue("taskNotes", initialTimeEntry.taskNotes || "");
+      } else {
+        console.log('No task notes found in entry');
+        setValue("taskNotes", "");
+      }
     } else if (!isOpen) {
       reset();
     }
@@ -119,6 +132,11 @@ export function EditTechnicianTimeEntryDialog({
         toast({ title: "Error", description: "Missing essential time entry information.", variant: "destructive"});
         return;
     }
+    console.log('Submitting edit with data:', {
+      entryId: initialTimeEntry.id,
+      technicianId: initialTimeEntry.technicianId,
+      data
+    });
     setIsSubmitting(true);
 
     try {
@@ -162,27 +180,48 @@ export function EditTechnicianTimeEntryDialog({
       const workDurationSeconds = Math.max(0, totalDurationSeconds - breakInSeconds);
 
       const timeEntryRef = doc(db, 'timeEntries', initialTimeEntry.id);
-      await updateDoc(timeEntryRef, {
-        // technicianId, clientId, locationId remain unchanged as they define the context
-        entryDate: format(data.entryDate, 'yyyy-MM-dd'), // Save date as YYYY-MM-DD string
+      
+      // Include all required fields from the original entry
+      // If this entry was previously approved, mark it as pending again
+      const updateData = {
+        technicianId: initialTimeEntry.technicianId,
+        clientId: initialTimeEntry.clientId,
+        locationId: initialTimeEntry.locationId,
+        entryDate: format(data.entryDate, 'yyyy-MM-dd'),
         startTime: formatISO(startDateTime),
         endTime: formatISO(endDateTime),
         totalBreakDurationSeconds: breakInSeconds,
         workDurationSeconds: workDurationSeconds,
-        taskNotes: data.taskNotes || null // Save task notes, use null if undefined
-      });
+        taskNotes: data.taskNotes || null,
+        // If entry was approved, mark as pending for re-approval
+        status: (initialTimeEntry as any).status === 'approved' ? 'pending_approval' : ((initialTimeEntry as any).status || 'draft')
+      };
+      
+      console.log('Updating document with:', updateData);
+      
+      // Only update the fields we're actually changing
+      await updateDoc(timeEntryRef, updateData);
 
+      const wasApproved = (initialTimeEntry as any).status === 'approved';
       toast({
         title: "Time Entry Updated",
-        description: "Your time entry has been successfully updated.",
+        description: wasApproved 
+          ? "Your time entry has been updated and will require re-approval."
+          : "Your time entry has been successfully updated.",
       });
       onTimeEntryUpdated();
       onOpenChange(false);
     } catch (error: any) {
       console.error("Error updating time entry:", error);
+      console.error("Full error details:", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        name: error.name
+      });
       toast({
         title: "Error",
-        description: `Could not update time entry. ${error.message || "Please try again."}`,
+        description: `Could not update time entry. ${error.code}: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -234,6 +273,11 @@ export function EditTechnicianTimeEntryDialog({
           <DialogTitle>Edit Time Entry</DialogTitle>
           <DialogDescription>
             Modify your time entry details. Client and Location are fixed for this entry.
+            {initialTimeEntry && (initialTimeEntry as any).status === 'approved' && (
+              <p className="mt-2 text-yellow-600 dark:text-yellow-500">
+                ⚠️ This entry was previously approved. Editing it will require re-approval.
+              </p>
+            )}
           </DialogDescription>
            {initialTimeEntry && (
             <div className="text-xs text-muted-foreground pt-1 space-y-0.5">

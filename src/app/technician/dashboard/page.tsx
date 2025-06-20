@@ -1,12 +1,11 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
 import { ClientSelector } from '@/components/technician/client-selector';
 import { LocationSelector } from '@/components/technician/location-selector';
 import { TimeTracker } from '@/components/technician/time-tracker';
-import { TaskLogger } from '@/components/technician/task-logger';
 import { TodaysTimeEntries } from '@/components/technician/todays-time-entries';
+import { MyTimeEntries } from '@/components/technician/my-time-entries';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Send, Loader2, AlertTriangle, ListChecks, Eye, Clock } from 'lucide-react';
@@ -25,7 +24,6 @@ export interface JobSubmission {
   clientName: string;
   locationName: string;
   technicianEmail: string;
-  taskNotes: string;
   status: string;
   submittedAt: Date | null;
   clientId?: string;
@@ -36,7 +34,6 @@ export interface JobSubmission {
 export default function TechnicianDashboardPage() {
   const [selectedClient, setSelectedClient] = useState<{ id: string; name: string } | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<{ id: string; name: string } | null>(null);
-  const [taskNotes, setTaskNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { currentUser } = useAuth();
@@ -74,7 +71,6 @@ export default function TechnicianDashboardPage() {
           clientName: data.clientName || 'N/A',
           locationName: data.locationName || 'N/A',
           technicianEmail: data.technicianEmail || 'N/A',
-          taskNotes: data.taskNotes || '',
           status: data.status || 'unknown',
           submittedAt: submittedAtTimestamp ? submittedAtTimestamp.toDate() : null,
           clientId: data.clientId,
@@ -101,10 +97,6 @@ export default function TechnicianDashboardPage() {
       toast({ title: "Action Required", description: "Please select a client, location, and ensure you are logged in.", variant: "destructive" });
       return;
     }
-    if (!taskNotes.trim()) {
-      toast({ title: "Task Notes Required", description: "Please enter some task notes before submitting.", variant: "destructive" });
-      return;
-    }
 
     setIsSubmitting(true);
     try {
@@ -116,7 +108,6 @@ export default function TechnicianDashboardPage() {
         locationName: selectedLocation.name,
         technicianId: currentUser.uid, 
         technicianEmail: currentUser.email, 
-        taskNotes: taskNotes,
         status: 'pending_approval',
         submittedAt: serverTimestamp(),
       });
@@ -125,7 +116,6 @@ export default function TechnicianDashboardPage() {
         title: "Submission Successful", 
         description: `Work for ${selectedClient?.name} at ${selectedLocation?.name} submitted for approval.` 
       });
-      setTaskNotes('');
       fetchTechnicianSubmissions();
       
     } catch (error) {
@@ -174,7 +164,6 @@ export default function TechnicianDashboardPage() {
                 <ClientSelector selectedClient={selectedClient} onClientSelect={(client) => {
                   setSelectedClient(client);
                   setSelectedLocation(null); 
-                  setTaskNotes(''); 
                 }} />
               </div>
               <div>
@@ -182,10 +171,7 @@ export default function TechnicianDashboardPage() {
                 <LocationSelector 
                   selectedClientId={selectedClient?.id || null} 
                   selectedLocation={selectedLocation} 
-                  onLocationSelect={(location) => {
-                    setSelectedLocation(location);
-                    setTaskNotes(''); 
-                  }}
+                  onLocationSelect={setSelectedLocation}
                 />
               </div>
             </CardContent>
@@ -200,12 +186,6 @@ export default function TechnicianDashboardPage() {
         </div>
 
         <div className="lg:col-span-2 space-y-6">
-          <TaskLogger 
-            isJobSelected={isJobSelected} 
-            notes={taskNotes}
-            onNotesChange={setTaskNotes}
-          />
-
           {isJobSelected && currentUser && (
             <TodaysTimeEntries 
               technicianId={currentUser.uid}
@@ -215,8 +195,47 @@ export default function TechnicianDashboardPage() {
           )}
         </div>
       </div>
+
       <Separator className="my-8" />
-      {/* Submit and submissions table unchanged */}
+      
+      {/* Submit Work Section - Moved above time entries */}
+      <div className="mb-8">
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Send className="h-6 w-6 text-primary" />
+              Submit Work for Approval
+            </CardTitle>
+            <CardDescription>Submit your completed work for client approval.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={handleClientApproval}
+              disabled={!isJobSelected || isSubmitting}
+              className="w-full sm:w-auto"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Submit for Approval
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Time Entries Section */}
+      {currentUser && (
+        <div className="space-y-6">
+          <MyTimeEntries technicianId={currentUser.uid} />
+        </div>
+      )}
     </div>
   );
 }
