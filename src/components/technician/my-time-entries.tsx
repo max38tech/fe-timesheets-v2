@@ -22,6 +22,7 @@ import {
 import { format, parseISO } from 'date-fns';
 import { formatDuration } from '@/lib/utils';
 import { EditTechnicianTimeEntryDialog } from './edit-technician-time-entry-dialog';
+import { ViewTechnicianTimeEntryDialog } from './view-technician-time-entry-dialog';
 
 interface ClientData {
   name: string;
@@ -33,7 +34,7 @@ interface LocationData {
   [key: string]: any;
 }
 
-interface TimeEntry {
+export interface TimeEntry {
   id: string;
   entryDate: string;
   startTime: string;
@@ -56,6 +57,7 @@ export function MyTimeEntries({ technicianId }: { technicianId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [selectedEntry, setSelectedEntry] = useState<TimeEntry | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
   const fetchTimeEntries = async () => {
     if (!technicianId) return;
@@ -165,52 +167,73 @@ export function MyTimeEntries({ technicianId }: { technicianId: string }) {
                   <TableHead>Date</TableHead>
                   <TableHead>Client</TableHead>
                   <TableHead>Location</TableHead>
-                  <TableHead>Start Time</TableHead>
-                  <TableHead>End Time</TableHead>
-                  <TableHead>Break</TableHead>
-                  <TableHead>Work Duration</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {timeEntries.map((entry) => (
-                  <TableRow key={entry.id}>
-                    <TableCell>{format(parseISO(entry.entryDate), 'MMM d, yyyy')}</TableCell>
-                    <TableCell>{entry.clientName}</TableCell>
-                    <TableCell>{entry.locationName}</TableCell>
-                    <TableCell>{format(parseISO(entry.startTime), 'HH:mm')}</TableCell>
-                    <TableCell>{format(parseISO(entry.endTime), 'HH:mm')}</TableCell>
-                    <TableCell>{formatDuration(entry.totalBreakDurationSeconds)}</TableCell>
-                    <TableCell>{formatDuration(entry.workDurationSeconds)}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(entry)}
-                        className="hover:text-primary"
-                      >
-                        <Edit3 className="h-4 w-4" />
-                        <span className="sr-only">Edit time entry</span>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+              <TableHead className="hidden sm:table-cell">Start Time</TableHead>
+              <TableHead className="hidden sm:table-cell">End Time</TableHead>
+              <TableHead className="hidden sm:table-cell">Break</TableHead>
+              <TableHead className="hidden sm:table-cell">Work Duration</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {timeEntries.map((entry) => (
+              <TableRow key={entry.id}>
+                <TableCell>{format(parseISO(entry.entryDate), 'MMM d, yyyy')}</TableCell>
+                <TableCell>{entry.clientName}</TableCell>
+                <TableCell>{entry.locationName}</TableCell>
+                <TableCell className="hidden sm:table-cell">{format(parseISO(entry.startTime), 'HH:mm')}</TableCell>
+                <TableCell className="hidden sm:table-cell">{format(parseISO(entry.endTime), 'HH:mm')}</TableCell>
+                <TableCell className="hidden sm:table-cell">{formatDuration(entry.totalBreakDurationSeconds)}</TableCell>
+                <TableCell className="hidden sm:table-cell">{formatDuration(entry.workDurationSeconds)}</TableCell>
+                <TableCell className="text-right flex justify-end gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleView(entry)}
+                    className="hover:text-primary"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span className="sr-only">View time entry</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleEdit(entry)}
+                    className="hover:text-primary"
+                  >
+                    <Edit3 className="h-4 w-4" />
+                    <span className="sr-only">Edit time entry</span>
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
             </Table>
           </div>
         )}
       </CardContent>
       {selectedEntry && (
-        <EditTechnicianTimeEntryDialog
-          isOpen={isEditDialogOpen}
-          onOpenChange={setIsEditDialogOpen}
-          timeEntry={selectedEntry}
-          onTimeEntryUpdated={() => {
-            setIsEditDialogOpen(false);
-            fetchTimeEntries();
-          }}
-        />
+        <>
+          <EditTechnicianTimeEntryDialog
+            isOpen={isEditDialogOpen}
+            onOpenChange={setIsEditDialogOpen}
+            timeEntry={selectedEntry}
+            onTimeEntryUpdated={() => {
+              setIsEditDialogOpen(false);
+              fetchTimeEntries();
+            }}
+          />
+          <ViewTechnicianTimeEntryDialog
+            isOpen={isViewDialogOpen}
+            onOpenChange={setIsViewDialogOpen}
+            timeEntry={selectedEntry}
+          />
+        </>
       )}
     </Card>
   );
+
+  function handleView(entry: TimeEntry) {
+    setSelectedEntry(entry);
+    setIsViewDialogOpen(true);
+  }
 }

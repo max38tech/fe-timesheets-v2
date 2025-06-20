@@ -151,8 +151,8 @@ export default function TechnicianDashboardPage() {
   return (
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-8 text-foreground">Technician Dashboard</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1 space-y-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="space-y-6 max-w-full sm:max-w-md mx-auto">
           <Card className="shadow-md">
             <CardHeader>
               <CardTitle>Job Selection</CardTitle>
@@ -185,7 +185,7 @@ export default function TechnicianDashboardPage() {
           />
         </div>
 
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 max-w-full sm:max-w-lg mx-auto">
           {isJobSelected && currentUser && (
             <TodaysTimeEntries 
               technicianId={currentUser.uid}

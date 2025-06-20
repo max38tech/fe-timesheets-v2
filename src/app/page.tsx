@@ -57,29 +57,7 @@ export default function HomePage() {
           </Card>
         </div>
         
-        <div className="mt-16 w-full max-w-4xl">
-          {/* <Image 
-            src="https://storage.googleapis.com/fe-timesheets-29db8.firebasestorage.app/public_assets/hero_image.png" 
-            alt="Hero image illustrating field service operations or time management" 
-            width={1200} 
-            height={400} 
-            className="rounded-lg shadow-md object-cover"
-            data-ai-hint="field service"
-            priority 
-          /> */}
-
-          {/* --- TEST: Using a standard img tag to bypass Next.js optimization --- */}
-          <Image 
-            src="https://storage.googleapis.com/fe-timesheets-29db8.firebasestorage.app/public_assets/hero_image.png" 
-            alt="Hero image illustrating field service operations or time management" 
-            width={1200} 
-            height={400} 
-            className="rounded-lg shadow-md object-cover"
-            data-ai-hint="field service"
-            priority
-            unoptimized={true} // <-- Add this line
-          />
-        </div>
+        
         <footer className="mt-16 text-center text-sm text-muted-foreground">
           <p>&copy; {new Date().getFullYear()} FE Timesheets. All rights reserved.</p>
           <p>Streamlining field service management.</p>
