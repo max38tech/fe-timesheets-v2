@@ -1,3 +1,1 @@
-# FE Timesheets
-
-FE Timesheets is a SaaS solution for handling Field Engineer timesheets across multiple clients, locations, and technicians. 
+## This repo is the starting point for version 2 of fe-timesheets, forked from [max38tech/fe-timesheets](https://github.com/max38tech/fe-timesheets)
