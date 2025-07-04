@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 
 export default function ApproveTimesheetPage() {
   const searchParams = useSearchParams();
-  const token = searchParams.get("token");
+  const token = searchParams?.get("token");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timesheet, setTimesheet] = useState<any>(null);
@@ -16,7 +16,7 @@ export default function ApproveTimesheetPage() {
 
   useEffect(() => {
     if (!token) {
-      setError("Missing token.");
+      setError("Missing or invalid token.");
       setLoading(false);
       return;
     }

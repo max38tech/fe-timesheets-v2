@@ -36,6 +36,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(404).json({ error: 'Timesheet not found' });
   }
   const timesheet = timesheetSnap.data();
+  if (!timesheet) {
+    return res.status(404).json({ error: 'Timesheet not found' });
+  }
 
   // Fetch location for contact info
   const locationRef = db.collection('locations').doc(timesheet.locationId);
@@ -44,6 +47,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(404).json({ error: 'Location not found' });
   }
   const location = locationSnap.data();
+  if (!location) {
+    return res.status(404).json({ error: 'Location not found' });
+  }
 
   // Generate approval token
   const token = generateToken(24);
@@ -76,13 +82,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     text: `A timesheet is awaiting your approval. Please review and approve or reject it here: ${approvalUrl}\nThis link will expire in 24 hours.`,
   };
 
-console.log("Attempting to send approval email to:", location.contactEmail);
-console.log("Approval URL:", approvalUrl);
+  console.log("Attempting to send approval email to:", location.contactEmail);
+  console.log("Approval URL:", approvalUrl);
 
-try {
-  await transporter.sendMail(mailOptions);
-  console.log("Approval email sent successfully.");
-} catch (error) {
-  console.error("Error sending approval email:", error);
-  return res.status(500).json({ error: "Failed to send approval email", details: error });
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log("Approval email sent successfully.");
+  } catch (error) {
+    console.error("Error sending approval email:", error);
+    return res.status(500).json({ error: "Failed to send approval email", details: error });
+  }
+
+  return res.status(200).json({ success: true });
 }
