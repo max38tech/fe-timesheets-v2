@@ -76,7 +76,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     text: `A timesheet is awaiting your approval. Please review and approve or reject it here: ${approvalUrl}\nThis link will expire in 24 hours.`,
   };
 
-  await transporter.sendMail(mailOptions);
+console.log("Attempting to send approval email to:", location.contactEmail);
+console.log("Approval URL:", approvalUrl);
 
-  return res.status(200).json({ success: true });
+try {
+  await transporter.sendMail(mailOptions);
+  console.log("Approval email sent successfully.");
+} catch (error) {
+  console.error("Error sending approval email:", error);
+  return res.status(500).json({ error: "Failed to send approval email", details: error });
 }
